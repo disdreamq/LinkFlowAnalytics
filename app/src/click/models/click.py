@@ -17,4 +17,4 @@ class Click(Base):
     region: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     
-    link: Mapped[Link] = relationship(back_populates="click")
+    link: Mapped['Link'] = relationship(back_populates="clicks")
