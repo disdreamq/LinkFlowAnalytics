@@ -20,9 +20,9 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 from app.db.base import Base # noqa
 from app.core.config import get_settings # noqa
-from app.src.user.models import user  #noqa
-from app.src.click.models import click  # noqa
-from app.src.link.models import link  # noqa
+from app.src.user import models  #noqa
+from app.src.click import models  # noqa
+from app.src.link import models  # noqa
 
 target_metadata = Base.metadata
 

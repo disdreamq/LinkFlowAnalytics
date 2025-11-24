@@ -5,7 +5,7 @@ from app.db.base import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 if TYPE_CHECKING:
-    from app.src.link.models.link import Link
+    from app.src.link.models import Link
 
 
 class Click(Base):
