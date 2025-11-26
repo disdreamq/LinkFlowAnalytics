@@ -4,8 +4,10 @@ from typing import Literal, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
+from sqlalchemy.orm import selectinload
 
 from src.core.exceptions_factory import exception_factory
+from src.entities.link.models import Link
 from src.entities.user.models import User
 from src.entities.user.schemas import SUserCreate, SUserUpdate
 
@@ -17,7 +19,7 @@ class AbstractRepository(ABC):
         raise NotImplementedError
     
     @abstractmethod
-    async def get_user():
+    async def get_user_by_id():
         raise NotImplementedError
     
     @abstractmethod
@@ -32,7 +34,7 @@ class UserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_user(self, user: SUserCreate) -> User:
+    async def create_user(self, user: SUserCreate) -> Optional[User]:
         try:
             if await self.get_user_by_email(user.email) is not None:
                 logger.error(f'Unique email error while adding user with email {user.email}')
@@ -133,3 +135,27 @@ class UserRepository(AbstractRepository):
         except Exception as e:
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"id": user_id})
+
+    async def get_all_links_by_user_id(self, user_id: int) -> Optional[list[User]]:
+        try:
+            stmt = (
+                select(User)
+                .where(User.id == user_id)
+                .options(
+                    selectinload(Link.clicks)
+                )
+            )
+            result = await self.session.execute(stmt)
+            return list(result.scalars().all())
+
+        except NoResultFound:
+            logger.warning(f"User with id {user_id} does not exists")
+            raise exception_factory.not_found(resource="user", identifier=user_id)
+
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while adding: {e}")
+            raise exception_factory.database_error(user_id)
+
+        except Exception as e:
+            logger.critical(f"Unexpected error while adding: {e}")
+            raise exception_factory.unexpected_error({"user_id": user_id})
