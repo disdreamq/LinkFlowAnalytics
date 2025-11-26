@@ -18,11 +18,11 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from app.db.base import Base # noqa
-from app.core.config import get_settings # noqa
-from app.src.user import models  #noqa
-from app.src.click import models  # noqa
-from app.src.link import models  # noqa
+from src.db.base import Base  # noqa
+from src.core.config import get_settings  # noqa
+from src.entities.user import models  # noqa
+from src.entities.click import models  # noqa
+from src.entities.link import models  # noqa
 
 target_metadata = Base.metadata
 

@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 import logging
 from typing import Literal, Optional
-from sqlalchemy import select, delete
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 
 from app.core.exceptions_factory import exception_factory
-from app.src.user.models import User
-from app.src.user.schemas import SUserCreate, SUserUpdate
+from app.entities.user.models import User
+from app.entities.user.schemas import SUserCreate, SUserUpdate
 
 logger = logging.getLogger(__name__)
 
-class abstract_repository(ABC):
+class AbstractRepository(ABC):
     @abstractmethod
     async def create_user():
         raise NotImplementedError
@@ -28,7 +28,7 @@ class abstract_repository(ABC):
     async def delete_user():
         raise NotImplementedError
 
-class user_repository(abstract_repository):
+class UserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -111,11 +111,11 @@ class user_repository(abstract_repository):
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding: {e}")
-            raise exception_factory.database_error(user_to_update.id)
+            raise exception_factory.database_error(user_id)
 
         except Exception as e:
             logger.critical(f"Unexpected error while adding: {e}")
-            raise exception_factory.unexpected_error({'id': user_to_update.id})
+            raise exception_factory.unexpected_error({"id": user_id})
 
     async def delete_user(self, user_id: int) -> Literal[True]:
         try:
@@ -124,7 +124,7 @@ class user_repository(abstract_repository):
             await self.session.delete(user_to_delete)
             await self.session.commit()
             return True
-        
+
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding: {e}")
             raise exception_factory.database_error(user_id)

@@ -7,7 +7,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from app.enums.enums import UserTarifPlan
 
 if TYPE_CHECKING:
-    from app.src.link.models import Link
+    from app.entities.link.models import Link
 
 class User(Base):
     __tablename__ = 'user'
