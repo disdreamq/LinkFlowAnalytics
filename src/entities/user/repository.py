@@ -38,10 +38,11 @@ class UserRepository(AbstractRepository):
                 logger.error(f'Unique email error while adding user with email {user.email}')
                 raise exception_factory.already_exists(user.email)
 
-            user_to_add = User(**user.model_dump())
-            self.session.add(user_to_add)
+            user_to_create = User(**user.model_dump())
+            self.session.add(user_to_create)
             await self.session.commit()
-            return user_to_add
+            await self.session.refresh(user_to_create)
+            return user_to_create
 
         except IntegrityError as e:
             logger.error(f"Integrity error while adding user: {e}")
@@ -74,7 +75,7 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({'user_id': user_id})
 
-    async def get_user_by_email(self, email: str ):
+    async def get_user_by_email(self, email: str ) -> Optional[User]:
         try:
             stmt = select(User).filter(User.email == email)
             result = await self.session.execute(stmt)
