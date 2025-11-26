@@ -5,9 +5,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 
-from app.core.exceptions_factory import exception_factory
-from app.entities.user.models import User
-from app.entities.user.schemas import SUserCreate, SUserUpdate
+from src.core.exceptions_factory import exception_factory
+from src.entities.user.models import User
+from src.entities.user.schemas import SUserCreate, SUserUpdate
 
 logger = logging.getLogger(__name__)
 

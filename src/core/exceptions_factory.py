@@ -1,5 +1,14 @@
 from typing import Any, Optional, Type
-from app.core.exceptions import AlreadyExistsException, BaseAppException, DataBaseException, NotFoundException, UnexpectedException, ValidationException, AuthenticationException, BusinessLogicException
+from src.core.exceptions import (
+    AlreadyExistsException,
+    BaseAppException,
+    DataBaseException,
+    NotFoundException,
+    UnexpectedException,
+    ValidationException,
+    AuthenticationException,
+    BusinessLogicException,
+)
 
 class ExceptionFactory:
     """Фабрика исключений"""

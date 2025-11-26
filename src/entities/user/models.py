@@ -1,13 +1,13 @@
 from typing import TYPE_CHECKING
 from datetime import datetime
 from sqlalchemy import func, Enum 
-from app.db.base import Base
+from src.db.base import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from app.enums.enums import UserTarifPlan
+from src.enums.enums import UserTarifPlan
 
 if TYPE_CHECKING:
-    from app.entities.link.models import Link
+    from src.entities.link.models import Link
 
 class User(Base):
     __tablename__ = 'user'

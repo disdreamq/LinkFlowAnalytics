@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING
 from datetime import datetime
 from sqlalchemy import ForeignKey, func
-from app.db.base import Base
+from src.db.base import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 if TYPE_CHECKING:
-    from app.entities.link.models import Link
+    from src.entities.link.models import Link
 
 
 class Click(Base):
