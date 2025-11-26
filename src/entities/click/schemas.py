@@ -5,16 +5,19 @@ from pydantic import BaseModel, ConfigDict
 if TYPE_CHECKING:
     from src.entities.link.schemas import SLinkGet
 
+
 class SClickCreate(BaseModel):
     link_id: int
     user_agent: str
     region: str
+
 
 class SClickGet(SClickCreate):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     created_at: datetime
+
 
 class SClickWithLink(SClickGet):
     link: SLinkGet

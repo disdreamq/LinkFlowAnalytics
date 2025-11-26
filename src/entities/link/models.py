@@ -21,5 +21,5 @@ class Link(Base):
         server_default=func.now(), onupdate=func.now()
     )
 
-    user: Mapped['User'] = relationship(back_populates="links")
-    clicks: Mapped[list['Click']] = relationship(back_populates='link')
+    user: Mapped["User"] = relationship(back_populates="links")
+    clicks: Mapped[list["Click"]] = relationship(back_populates="link")

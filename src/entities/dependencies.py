@@ -1,4 +1,4 @@
-from app.db.session import AsyncSessionLocal
+from src.db.session import AsyncSessionLocal
 
 
 async def get_session():

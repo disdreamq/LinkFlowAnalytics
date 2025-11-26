@@ -55,10 +55,7 @@ class LinkRepository(AbstractRepository):
 
     async def get_link_by_id(self, link_id: int) -> Optional[Link]:
         try:
-            stmt = (
-                select(Link)
-                .where(Link.id==link_id)
-            )
+            stmt = select(Link).where(Link.id == link_id)
             result = await self.session.execute(stmt)
             return result.scalar_one_or_none()
 
@@ -76,11 +73,7 @@ class LinkRepository(AbstractRepository):
 
     async def get_link_with_user(self, link_id: int) -> Optional[Link]:
         try:
-            stmt = (
-                select(Link)
-                .where(Link.id==link_id)
-                .options(joinedload(Link.user))
-            )
+            stmt = select(Link).where(Link.id == link_id).options(joinedload(Link.user))
             result = await self.session.execute(stmt)
             return result.scalar_one_or_none()
 
@@ -123,10 +116,7 @@ class LinkRepository(AbstractRepository):
             stmt = (
                 select(Link)
                 .where(Link.id == link_id)
-                .options(
-                    joinedload(Link.user),    
-                    selectinload(Link.clicks)
-                    )
+                .options(joinedload(Link.user), selectinload(Link.clicks))
             )
             result = await self.session.execute(stmt)
             return result.unique().scalar_one_or_none()

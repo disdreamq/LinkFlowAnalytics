@@ -10,6 +10,7 @@ from src.core.exceptions import (
     BusinessLogicException,
 )
 
+
 class ExceptionFactory:
     """Фабрика исключений"""
 
@@ -17,24 +18,25 @@ class ExceptionFactory:
     def create_exception(
         exception: Type[BaseAppException],
         message: str,
-        detail: Optional[str] = '',
+        detail: Optional[str] = "",
         **kwargs: Any,
     ) -> BaseAppException:
         return exception(message=message, detail=detail, **kwargs)
+
     @staticmethod
     def not_found(resource: str, identifier: Any) -> BaseAppException:
         return ExceptionFactory.create_exception(
             exception=NotFoundException,
             message=f"{resource} not found",
-            detail=f"{resource} with id {identifier} was not found"
+            detail=f"{resource} with id {identifier} was not found",
         )
-        
+
     @staticmethod
     def already_exists(email: str):
         return ExceptionFactory.create_exception(
             exception=AlreadyExistsException,
             message="User with that email already exists",
-            detail=f'User with email {email} already exists'
+            detail=f"User with email {email} already exists",
         )
 
     @staticmethod
@@ -42,7 +44,7 @@ class ExceptionFactory:
         return ExceptionFactory.create_exception(
             exception=ValidationException,
             message="Validation error",
-            detail=f"Field '{field}': {issue}"
+            detail=f"Field '{field}': {issue}",
         )
 
     @staticmethod
@@ -50,7 +52,7 @@ class ExceptionFactory:
         return ExceptionFactory.create_exception(
             exception=AuthenticationException,
             message=message,
-            detail="Please provide valid authentication credentials"
+            detail="Please provide valid authentication credentials",
         )
 
     @staticmethod
@@ -65,15 +67,17 @@ class ExceptionFactory:
     def database_error(source: Any) -> BaseAppException:
         return ExceptionFactory.create_exception(
             exception=DataBaseException,
-            message='Data base error',
-            detail=f'Problems with data base while processing with {source}',
+            message="Data base error",
+            detail=f"Problems with data base while processing with {source}",
         )
+
     @staticmethod
     def unexpected_error(*args: Any, **kwargs: Any) -> BaseAppException:
         return ExceptionFactory.create_exception(
             exception=UnexpectedException,
-            message='Unexpected exception',
-            detail=f'Unexpected error while processing {args}, {kwargs}',
+            message="Unexpected exception",
+            detail=f"Unexpected error while processing {args}, {kwargs}",
         )
+
 
 exception_factory = ExceptionFactory()

@@ -13,22 +13,24 @@ from src.entities.user.schemas import SUserCreate, SUserUpdate
 
 logger = logging.getLogger(__name__)
 
+
 class AbstractRepository(ABC):
     @abstractmethod
     async def create_user():
         raise NotImplementedError
-    
+
     @abstractmethod
     async def get_user_by_id():
         raise NotImplementedError
-    
+
     @abstractmethod
     async def update_user():
         raise NotImplementedError
-    
+
     @abstractmethod
     async def delete_user():
         raise NotImplementedError
+
 
 class UserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
@@ -37,7 +39,9 @@ class UserRepository(AbstractRepository):
     async def create_user(self, user: SUserCreate) -> Optional[User]:
         try:
             if await self.get_user_by_email(user.email) is not None:
-                logger.error(f'Unique email error while adding user with email {user.email}')
+                logger.error(
+                    f"Unique email error while adding user with email {user.email}"
+                )
                 raise exception_factory.already_exists(user.email)
 
             user_to_create = User(**user.model_dump())
@@ -48,7 +52,9 @@ class UserRepository(AbstractRepository):
 
         except IntegrityError as e:
             logger.error(f"Integrity error while adding user: {e}")
-            raise exception_factory.business_error('Bad data error',)
+            raise exception_factory.business_error(
+                "Bad data error",
+            )
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding: {e}")
@@ -56,7 +62,7 @@ class UserRepository(AbstractRepository):
 
         except Exception as e:
             logger.critical(f"Unexpected error while adding: {e}")
-            raise exception_factory.unexpected_error({'user': user})
+            raise exception_factory.unexpected_error({"user": user})
 
     async def get_user_by_id(self, user_id: int) -> Optional[User]:
         try:
@@ -66,8 +72,8 @@ class UserRepository(AbstractRepository):
             return user
 
         except NoResultFound:
-            logger.warning(f'User with id {user_id} does not exists')
-            raise exception_factory.not_found(resource='user', identifier=user_id)
+            logger.warning(f"User with id {user_id} does not exists")
+            raise exception_factory.not_found(resource="user", identifier=user_id)
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding: {e}")
@@ -75,9 +81,9 @@ class UserRepository(AbstractRepository):
 
         except Exception as e:
             logger.critical(f"Unexpected error while adding: {e}")
-            raise exception_factory.unexpected_error({'user_id': user_id})
+            raise exception_factory.unexpected_error({"user_id": user_id})
 
-    async def get_user_by_email(self, email: str ) -> Optional[User]:
+    async def get_user_by_email(self, email: str) -> Optional[User]:
         try:
             stmt = select(User).filter(User.email == email)
             result = await self.session.execute(stmt)
@@ -96,12 +102,14 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error(email=email)
 
-    async def update_user(self, user_to_update: SUserUpdate, user_id: int) -> Literal[True]:
+    async def update_user(
+        self, user_to_update: SUserUpdate, user_id: int
+    ) -> Literal[True]:
         try:
             user = self.get_user_by_id(user_id)
 
             for key, value in user_to_update.model_dump(
-                exclude_unset=True, 
+                exclude_unset=True,
                 exclude_none=True,
             ).items():
                 if hasattr(user, key):
@@ -141,9 +149,7 @@ class UserRepository(AbstractRepository):
             stmt = (
                 select(User)
                 .where(User.id == user_id)
-                .options(
-                    selectinload(Link.clicks)
-                )
+                .options(selectinload(Link.clicks))
             )
             result = await self.session.execute(stmt)
             return list(result.scalars().all())

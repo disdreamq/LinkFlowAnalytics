@@ -12,6 +12,7 @@ from src.core.exceptions_factory import exception_factory
 
 logger = logging.getLogger(__name__)
 
+
 class AbstractRepository(ABC):
     @abstractmethod
     async def create_click():
@@ -20,6 +21,7 @@ class AbstractRepository(ABC):
     @abstractmethod
     async def get_click():
         raise NotImplementedError
+
 
 class ClickRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
@@ -49,13 +51,10 @@ class ClickRepository(AbstractRepository):
 
     async def get_click(self, click_id: int) -> Optional[Click]:
         try:
-            stmt = (
-                select(Click)
-                .where(Click.id == click_id)
-            )
+            stmt = select(Click).where(Click.id == click_id)
             result = await self.session.execute(stmt)
             return result.scalar_one_or_none()
-        
+
         except NoResultFound:
             logger.warning(f"Click with id {click_id} does not exists")
             raise exception_factory.not_found(resource="click", identifier=click_id)

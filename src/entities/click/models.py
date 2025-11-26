@@ -12,9 +12,9 @@ class Click(Base):
     __tablename__ = "click"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    link_id: Mapped[int] = mapped_column(ForeignKey('link.id', ondelete='CASCADE'))
+    link_id: Mapped[int] = mapped_column(ForeignKey("link.id", ondelete="CASCADE"))
     user_agent: Mapped[str]
     region: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    
-    link: Mapped['Link'] = relationship(back_populates="clicks")
+
+    link: Mapped["Link"] = relationship(back_populates="clicks")

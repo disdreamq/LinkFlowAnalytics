@@ -26,7 +26,8 @@ class NotFoundException(BaseAppException):
             message=message,
             detail=detail,
         )
-        
+
+
 class AlreadyExistsException(BaseAppException):
     def __init__(self, message: str, detail: Optional[str] = None):
         super().__init__(
@@ -34,6 +35,7 @@ class AlreadyExistsException(BaseAppException):
             message=message,
             detail=detail,
         )
+
 
 class ValidationException(BaseAppException):
     def __init__(self, message: str, detail: Optional[str] = None):
@@ -61,8 +63,8 @@ class BusinessLogicException(BaseAppException):
             message=message,
             detail=detail,
         )
-        
-        
+
+
 class DataBaseException(BaseAppException):
     def __init__(self, message: str, detail: Optional[str] = None):
         super().__init__(
@@ -70,7 +72,8 @@ class DataBaseException(BaseAppException):
             message=message,
             detail=detail,
         )
-        
+
+
 class UnexpectedException(BaseAppException):
     def __init__(self, message: str, detail: Optional[str] = None):
         super().__init__(
