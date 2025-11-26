@@ -28,16 +28,14 @@ class RedisConnectionManager:
 
         try:
             if self._pool is None:
-                logger.error('Redis error, pool is None')
-                raise RuntimeError('Failed to create Redis connection pool')
+                logger.error("Redis error, pool is None")
+                raise RuntimeError("Failed to create Redis connection pool")
             yield self._pool
         except Exception as e:
             print(f"Redis connection error: {e}")
             raise
 
-
     async def close_pool(self):
-        """Закрытие всех подключений"""
         if self._pool:
             await self._pool.close()
             self._pool = None

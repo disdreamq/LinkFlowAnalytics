@@ -16,11 +16,8 @@ class URLGenerator:
             self.current[i] = 0
         else:
             raise StopIteration
-        
+
         yield url
 
     def get_next_url(self):
         return next(self._generate_url())
-
-
-

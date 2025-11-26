@@ -20,7 +20,7 @@ class AbstractRedisRepository(ABC):
 
     @abstractmethod
     async def exists(self, key: str) -> bool:
-        raise NotImplementedError 
+        raise NotImplementedError
 
 
 class RedisRepository(AbstractRedisRepository):

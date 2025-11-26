@@ -12,8 +12,6 @@ from src.core.exceptions import (
 
 
 class ExceptionFactory:
-    """Фабрика исключений"""
-
     @staticmethod
     def create_exception(
         exception: Type[BaseAppException],

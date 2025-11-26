@@ -4,8 +4,6 @@ from fastapi import HTTPException, status
 
 
 class BaseAppException(HTTPException):
-    """Базовое исключение для FastApi"""
-
     def __init__(
         self,
         status_code: int,
