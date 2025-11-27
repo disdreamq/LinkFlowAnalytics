@@ -27,7 +27,7 @@ class RedisRepository(AbstractRedisRepository):
     def __init__(self, connection_manager: RedisConnectionManager):
         self.connection_manager = connection_manager
 
-    async def set(self, key: str, value: Any, expire: int = 3600) -> bool:
+    async def set(self, key: str, value: Any, expire: Optional[int] = None) -> bool:
         try:
             async with self.connection_manager.get_connection() as conn:
                 return await conn.set(key, value, ex=expire)
@@ -43,10 +43,10 @@ class RedisRepository(AbstractRedisRepository):
             print(f"Redis get error: {e}")
             return None
 
-    async def delete(self, *keys: str) -> int:
+    async def delete(self, key: str) -> int:
         try:
             async with self.connection_manager.get_connection() as conn:
-                return await conn.delete(*keys)
+                return await conn.delete(key)
         except RedisError as e:
             print(f"Redis delete error: {e}")
             return 0
@@ -58,3 +58,6 @@ class RedisRepository(AbstractRedisRepository):
         except RedisError as e:
             print(f"Redis exists error: {e}")
             return False
+
+
+redis = RedisRepository(RedisConnectionManager())
