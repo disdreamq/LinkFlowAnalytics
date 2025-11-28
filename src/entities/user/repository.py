@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import logging
-from typing import Literal, Optional
+from typing import Literal
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound

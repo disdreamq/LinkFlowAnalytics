@@ -6,7 +6,6 @@ import logging
 from src.entities.link.dependencies import get_link_repository
 from src.entities.link.schemas import SLinkCreate, SLinkGet
 from src.entities.link.repository import LinkRepository
-from src.core.exceptions_factory import exception_factory
 
 
 logger = logging.getLogger(__name__)
