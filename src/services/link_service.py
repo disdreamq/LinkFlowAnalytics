@@ -35,3 +35,5 @@ class URLGenerator:
 
     async def del_cache(self):
         return await self.redis.delete("current")
+    
+url_generator = URLGenerator()
