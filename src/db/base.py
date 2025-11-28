@@ -12,3 +12,5 @@ class Base(DeclarativeBase):
                 cols.append(f'{col}={getattr(self, col)}')
                 
         return f'<{self.__class__.__name__} {', '.join(cols)}>'
+    
+

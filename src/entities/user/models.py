@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
