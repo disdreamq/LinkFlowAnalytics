@@ -34,7 +34,9 @@ class LinkRepository(AbstractRepository):
 
     async def create_link(self, link: SLinkCreate) -> Optional[Link]:
         try:
-            link_to_create = Link(**link.model_dump(), url= await url_generator.get_url())
+            link_to_create = Link(
+                **link.model_dump(), url=await url_generator.get_url()
+            )
             self.session.add(link_to_create)
             await self.session.flush()
             return link_to_create

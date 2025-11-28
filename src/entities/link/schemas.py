@@ -23,13 +23,13 @@ class SLinkGet(SLinkCreate):
 
 
 class SLinkWithUser(SLinkGet):
-    user: 'SUserGet'
+    user: "SUserGet"
 
 
 class SLinkWithClicks(SLinkGet):
-    clicks: list['SClickGet'] = []
+    clicks: list["SClickGet"] = []
 
 
 class SLinkFull(SLinkGet):
-    user: 'SUserGet'
-    clicks: list['SClickGet'] = []
+    user: "SUserGet"
+    clicks: list["SClickGet"] = []

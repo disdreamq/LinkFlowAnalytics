@@ -23,7 +23,7 @@ class SUserGet(SUserCreate):
 
 
 class SUserGetWithLinks(SUserGet):
-    links: list[SLinkGet] = []
+    links: list["SLinkGet"] = []
 
 
 class SUserUpdate(SUserCreate):
