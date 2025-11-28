@@ -31,8 +31,7 @@ class ClickRepository(AbstractRepository):
         try:
             click_to_create = Click(**click.model_dump())
             self.session.add(click_to_create)
-            await self.session.commit()
-            await self.session.refresh(click_to_create)
+            await self.session.flush()
             return click_to_create
 
         except IntegrityError as e:

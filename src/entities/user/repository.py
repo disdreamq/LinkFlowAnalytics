@@ -46,8 +46,7 @@ class UserRepository(AbstractRepository):
 
             user_to_create = User(**user.model_dump())
             self.session.add(user_to_create)
-            await self.session.commit()
-            await self.session.refresh(user_to_create)
+            await self.session.flush()
             return user_to_create
 
         except IntegrityError as e:
@@ -116,8 +115,7 @@ class UserRepository(AbstractRepository):
                     setattr(user, key, value)
 
             self.session.add(user)
-            await self.session.commit()
-            await self.session.refresh(user)
+            await self.session.flush()
             return True
 
         except SQLAlchemyError as e:
@@ -133,7 +131,6 @@ class UserRepository(AbstractRepository):
             user_to_delete = self.get_user_by_id(user_id)
 
             await self.session.delete(user_to_delete)
-            await self.session.commit()
             return True
 
         except SQLAlchemyError as e:
