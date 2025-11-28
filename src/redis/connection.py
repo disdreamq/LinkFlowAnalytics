@@ -3,13 +3,13 @@ import redis.asyncio as redis
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Optional
 
-from core.config import get_settings
+from src.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
 
 class RedisConnectionManager:
-    async def __init__(self):
+    def __init__(self):
         self._pool: Optional[redis.Redis] = None
 
     async def create_pool(self):

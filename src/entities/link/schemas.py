@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 class SLinkCreate(BaseModel):
     user_id: int
     base_url: str
-    url: str
 
 
 class SLinkGet(SLinkCreate):
@@ -18,18 +17,19 @@ class SLinkGet(SLinkCreate):
 
     id: int
     user_id: int
+    url: str
     created_at: datetime
     updated_at: datetime
 
 
 class SLinkWithUser(SLinkGet):
-    user: SUserGet
+    user: 'SUserGet'
 
 
 class SLinkWithClicks(SLinkGet):
-    clicks: list[SClickGet] = []
+    clicks: list['SClickGet'] = []
 
 
 class SLinkFull(SLinkGet):
-    user: SUserGet
-    clicks: list[SClickGet] = []
+    user: 'SUserGet'
+    clicks: list['SClickGet'] = []
