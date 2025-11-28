@@ -36,7 +36,7 @@ class UserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_user(self, user: SUserCreate) -> Optional[User]:
+    async def create_user(self, user: SUserCreate) -> User:
         try:
             if await self.get_user_by_email(user.email) is not None:
                 logger.error(
@@ -63,11 +63,11 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"user": user})
 
-    async def get_user_by_id(self, user_id: int) -> Optional[User]:
+    async def get_user_by_id(self, user_id: int) -> User:
         try:
             stmt = select(User).filter(User.id == user_id)
             result = await self.session.execute(stmt)
-            user = result.scalar_one_or_none()
+            user = result.scalar_one()
             return user
 
         except NoResultFound:
@@ -82,11 +82,11 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"user_id": user_id})
 
-    async def get_user_by_email(self, email: str) -> Optional[User]:
+    async def get_user_by_email(self, email: str) -> User:
         try:
             stmt = select(User).filter(User.email == email)
             result = await self.session.execute(stmt)
-            user = result.scalar_one_or_none()
+            user = result.scalar_one()
             return user
 
         except NoResultFound:
@@ -141,7 +141,7 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"id": user_id})
 
-    async def get_all_links_by_user_id(self, user_id: int) -> Optional[list[User]]:
+    async def get_all_links_by_user_id(self, user_id: int) -> list[User]:
         try:
             stmt = (
                 select(User)

@@ -32,7 +32,7 @@ class LinkRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_link(self, link: SLinkCreate) -> Optional[Link]:
+    async def create_link(self, link: SLinkCreate) -> Link:
         try:
             link_to_create = Link(
                 **link.model_dump(), url=await url_generator.get_url()
@@ -55,9 +55,9 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link": link})
 
-    async def get_link_by_url(self, link_url: str) -> Optional[Link]:
+    async def get_link_by_url(self, link_url: str) -> Link:
         try:
-            stmt = select(Link).where(Link.url == link_url)
+            stmt = select(Link).filter(Link.url == link_url)
             result = await self.session.execute(stmt)
             return result.scalar_one()
 
@@ -75,7 +75,7 @@ class LinkRepository(AbstractRepository):
 
     async def get_link_by_id(self, link_id: int) -> Optional[Link]:
         try:
-            stmt = select(Link).where(Link.id == link_id)
+            stmt = select(Link).filter(Link.id == link_id)
             result = await self.session.execute(stmt)
             return result.scalar_one_or_none()
 
@@ -91,11 +91,13 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link_id": link_id})
 
-    async def get_link_with_user(self, link_id: int) -> Optional[Link]:
+    async def get_link_with_user(self, link_id: int) -> Link:
         try:
-            stmt = select(Link).where(Link.id == link_id).options(joinedload(Link.user))
+            stmt = (
+                select(Link).filter(Link.id == link_id).options(joinedload(Link.user))
+            )
             result = await self.session.execute(stmt)
-            return result.scalar_one_or_none()
+            return result.scalar_one()
 
         except NoResultFound:
             logger.warning(f"Link with id {link_id} does not exists")
@@ -109,7 +111,7 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link_id": link_id})
 
-    async def get_link_with_clicks(self, link_id: int) -> Optional[Link]:
+    async def get_link_with_clicks(self, link_id: int) -> Link:
         try:
             stmt = (
                 select(Link)
@@ -117,7 +119,7 @@ class LinkRepository(AbstractRepository):
                 .options(selectinload(Link.clicks))
             )
             result = await self.session.execute(stmt)
-            return result.scalar_one_or_none()
+            return result.scalar_one()
 
         except NoResultFound:
             logger.warning(f"Link with id {link_id} does not exists")
@@ -131,7 +133,7 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link_id": link_id})
 
-    async def get_full_link(self, link_id: int) -> Optional[Link]:
+    async def get_full_link(self, link_id: int) -> Link:
         try:
             stmt = (
                 select(Link)
@@ -139,7 +141,7 @@ class LinkRepository(AbstractRepository):
                 .options(joinedload(Link.user), selectinload(Link.clicks))
             )
             result = await self.session.execute(stmt)
-            return result.unique().scalar_one_or_none()
+            return result.unique().scalar_one()
 
         except NoResultFound:
             logger.warning(f"Link with id {link_id} does not exists")

@@ -27,7 +27,7 @@ class ClickRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_click(self, click: SClickCreate) -> Optional[Click]:
+    async def create_click(self, click: SClickCreate) -> Click:
         try:
             click_to_create = Click(**click.model_dump())
             self.session.add(click_to_create)
@@ -48,11 +48,11 @@ class ClickRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"click": click})
 
-    async def get_click(self, click_id: int) -> Optional[Click]:
+    async def get_click(self, click_id: int) -> Click:
         try:
             stmt = select(Click).where(Click.id == click_id)
             result = await self.session.execute(stmt)
-            return result.scalar_one_or_none()
+            return result.scalar_one()
 
         except NoResultFound:
             logger.warning(f"Click with id {click_id} does not exists")
