@@ -91,7 +91,6 @@ async def partically_update_user(
 
 @router.delete(
     "/{user_id}",
-    response_model=Literal[True],
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete user",
     responses={
@@ -104,6 +103,6 @@ async def partically_update_user(
 async def delete_user(
     user_id: int,
     repo: Annotated[UserRepository, Depends(get_user_repository)],
-) -> Literal[True]:
+):
     user = await repo.delete_user(user_id)
     return user
