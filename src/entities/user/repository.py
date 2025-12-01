@@ -102,7 +102,9 @@ class UserRepository(AbstractRepository):
             raise exception_factory.unexpected_error(email=email)
 
     async def update_user(
-        self, user_to_update: SUserUpdate, user_id: int
+        self,
+        user_id: int, 
+        user_to_update: SUserUpdate,
     ) -> Literal[True]:
         try:
             user = self.get_user_by_id(user_id)
