@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import logging
-from typing import Literal
+from typing import Literal, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
@@ -43,7 +43,6 @@ class UserRepository(AbstractRepository):
                     f"Unique email error while adding user with email {user.email}"
                 )
                 raise exception_factory.already_exists(user.email)
-
             user_to_create = User(**user.model_dump())
             self.session.add(user_to_create)
             await self.session.flush()
@@ -82,11 +81,11 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"user_id": user_id})
 
-    async def get_user_by_email(self, email: str) -> User:
+    async def get_user_by_email(self, email: str) -> Optional[User]:
         try:
             stmt = select(User).filter(User.email == email)
             result = await self.session.execute(stmt)
-            user = result.scalar_one()
+            user = result.scalar_one_or_none()
             return user
 
         except NoResultFound:
