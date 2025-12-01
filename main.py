@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import uvicorn
-from src.entities.link.router import router
+from src.entities import router
 
 
 @asynccontextmanager
