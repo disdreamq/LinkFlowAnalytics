@@ -6,3 +6,9 @@ router = APIRouter()
 
 router.include_router(link_router)
 router.include_router(user_router)
+
+from .user.models import User
+from .link.models import Link
+from .click.models import Click
+
+__all__ = ["User", "Link", "Click"]
