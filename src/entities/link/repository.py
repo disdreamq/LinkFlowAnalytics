@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import logging
 from typing import Literal, Optional
+from pydantic import HttpUrl
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
@@ -55,7 +56,7 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link": link})
 
-    async def get_link_by_url(self, link_url: str) -> Link:
+    async def get_link_by_url(self, link_url: HttpUrl) -> Link:
         try:
             stmt = select(Link).filter(Link.url == link_url)
             result = await self.session.execute(stmt)

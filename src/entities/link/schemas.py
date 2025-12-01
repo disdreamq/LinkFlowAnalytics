@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, HttpUrl
 
 if TYPE_CHECKING:
     from src.entities.click.schemas import SClickGet
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class SLinkCreate(BaseModel):
     user_id: int
-    base_url: str
+    base_url: HttpUrl
 
 
 class SLinkGet(SLinkCreate):
