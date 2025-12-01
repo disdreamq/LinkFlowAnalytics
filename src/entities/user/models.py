@@ -1,14 +1,10 @@
-from typing import TYPE_CHECKING
+from __future__ import annotations
 from datetime import datetime
-from sqlalchemy import func, Enum
+from sqlalchemy import String, func, Enum
 from src.db.base import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.enums.enums import UserTarifPlan
-
-if TYPE_CHECKING:
-    from src.entities.link.models import Link
-
 
 class User(Base):
     __tablename__ = "users"
@@ -17,7 +13,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     password: Mapped[str] = mapped_column(nullable=False)
     tarifplan: Mapped[UserTarifPlan] = mapped_column(
-        Enum(UserTarifPlan),
+        String(50),
         default=UserTarifPlan.Base,
         server_default=UserTarifPlan.Base.value,
     )
@@ -26,6 +22,6 @@ class User(Base):
         server_default=func.now(), onupdate=func.now()
     )
 
-    links: Mapped[list["Link"]] = relationship(
+    links: Mapped[list['Link']] = relationship( # noqa #type: ignore
         back_populates="user", cascade="all, delete-orphan"
     )
