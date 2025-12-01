@@ -12,24 +12,25 @@ class SLinkCreate(BaseModel):
     base_url: HttpUrl
 
 
-class SLinkGet(SLinkCreate):
+class SLinkResponse(SLinkCreate):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     user_id: int
+    base_url: str
     url: str
     created_at: datetime
     updated_at: datetime
 
 
-class SLinkWithUser(SLinkGet):
+class SLinkWithUser(SLinkResponse):
     user: "SUserGet"
 
 
-class SLinkWithClicks(SLinkGet):
+class SLinkWithClicks(SLinkResponse):
     clicks: list["SClickGet"] = []
 
 
-class SLinkFull(SLinkGet):
+class SLinkFull(SLinkResponse):
     user: "SUserGet"
     clicks: list["SClickGet"] = []

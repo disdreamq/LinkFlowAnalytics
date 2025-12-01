@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 if TYPE_CHECKING:
-    from src.entities.link.schemas import SLinkGet
+    from src.entities.link.schemas import SLinkResponse
 
 
 class SClickCreate(BaseModel):
@@ -20,4 +20,4 @@ class SClickGet(SClickCreate):
 
 
 class SClickWithLink(SClickGet):
-    link: SLinkGet
+    link: SLinkResponse

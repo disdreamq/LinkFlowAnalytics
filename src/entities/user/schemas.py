@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 from src.enums.enums import UserTarifPlan
 
 if TYPE_CHECKING:
-    from src.entities.link.schemas import SLinkGet
+    from src.entities.link.schemas import SLinkResponse
 
 
 class SUserCreate(BaseModel):
@@ -23,7 +23,7 @@ class SUserGet(SUserCreate):
 
 
 class SUserGetWithLinks(SUserGet):
-    links: list["SLinkGet"] = []
+    links: list["SLinkResponse"] = []
 
 
 class SUserUpdate(SUserCreate):

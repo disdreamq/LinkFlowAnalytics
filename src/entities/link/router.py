@@ -6,7 +6,7 @@ import logging
 from pydantic import HttpUrl
 
 from src.entities.link.dependencies import get_link_repository
-from src.entities.link.schemas import SLinkCreate, SLinkGet
+from src.entities.link.schemas import SLinkCreate, SLinkResponse
 from src.entities.link.repository import LinkRepository
 
 
@@ -16,7 +16,7 @@ router = APIRouter(tags=["links"])
 
 @router.post(
     "/",
-    response_model=SLinkGet,
+    response_model=SLinkResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create short URL",
     description="Create a shor URL for simplify base URL",
@@ -31,7 +31,7 @@ async def create_link(
     repo: Annotated[LinkRepository, Depends(get_link_repository)],
 ):
     new_link = await repo.create_link(link)
-    return new_link.url
+    return new_link
 
 
 @router.get(
@@ -48,5 +48,5 @@ async def create_link(
 async def redirect(
     url: HttpUrl, repo: Annotated[LinkRepository, Depends(get_link_repository)]
 ):
-    link = await repo.get_link_by_url(url)
+    link = await repo.get_link_by_base_url(str(url))
     return RedirectResponse(link.base_url)
