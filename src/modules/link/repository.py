@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 import logging
-from typing import Literal, Optional
+from typing import Literal
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 from sqlalchemy.orm import selectinload, joinedload
 
-from src.core.exceptions_factory import exception_factory
+from src.core.exception_factory import exception_factory
 from src.modules.link.models import Link
 from src.modules.link.schemas import SLinkCreate, SLinkResponse
-from modules.link.service import url_generator
+from src.modules.link.service import url_generator
 
 logger = logging.getLogger(__name__)
 
@@ -75,11 +75,11 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link_url": base_url})
 
-    async def get_link_by_id(self, link_id: int) -> Optional[SLinkResponse]:
+    async def get_link_by_id(self, link_id: int) -> SLinkResponse:
         try:
             stmt = select(Link).filter(Link.id == link_id)
             result = await self.session.execute(stmt)
-            return SLinkResponse.model_validate(result.scalar_one_or_none())
+            return SLinkResponse.model_validate(result.scalar_one())
 
         except NoResultFound:
             logger.warning(f"Link with id {link_id} does not exists")

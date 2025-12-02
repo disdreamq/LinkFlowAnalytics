@@ -6,10 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 from sqlalchemy.orm import selectinload
 
-from src.core.exceptions_factory import exception_factory
+from src.core.exception_factory import exception_factory
+from src.core.security import get_password_hash
 from src.modules.link.models import Link
 from src.modules.user.models import User
-from src.modules.user.schemas import SUserCreate, SUserUpdate
+from src.modules.user.schemas import SUserCreate, SUserResponse, SUserResponseWithLinks, SUserUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -36,17 +37,21 @@ class UserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_user(self, user: SUserCreate) -> User:
+    async def create_user(self, user: SUserCreate) -> SUserResponse:
         try:
             if await self.get_user_by_email(user.email) is not None:
                 logger.error(
                     f"Unique email error while adding user with email {user.email}"
                 )
                 raise exception_factory.already_exists(user.email)
-            user_to_create = User(**user.model_dump())
+            
+            user_dict = user.model_dump()
+            user_dict["password"] = get_password_hash(user_dict["password"])
+            user_to_create = User(**user_dict)
             self.session.add(user_to_create)
+            
             await self.session.flush()
-            return user_to_create
+            return SUserResponse.model_validate(user_to_create)
 
         except IntegrityError as e:
             logger.error(f"Integrity error while adding user: {e}")
@@ -62,12 +67,12 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"user": user})
 
-    async def get_user_by_id(self, user_id: int) -> User:
+    async def get_user_by_id(self, user_id: int) -> SUserResponse:
         try:
             stmt = select(User).filter(User.id == user_id)
             result = await self.session.execute(stmt)
             user = result.scalar_one()
-            return user
+            return SUserResponse.model_validate(user)
 
         except NoResultFound:
             logger.warning(f"User with id {user_id} does not exists")
@@ -81,12 +86,14 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"user_id": user_id})
 
-    async def get_user_by_email(self, email: str) -> Optional[User]:
+    async def get_user_by_email(self, email: str) -> Optional[SUserResponse]:
         try:
             stmt = select(User).filter(User.email == email)
             result = await self.session.execute(stmt)
             user = result.scalar_one_or_none()
-            return user
+            if not user:
+                return None
+            return SUserResponse.model_validate(user)
 
         except NoResultFound:
             logger.warning(f"User with email {email} does not exists")
@@ -142,7 +149,7 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"id": user_id})
 
-    async def get_all_links_by_user_id(self, user_id: int) -> list[User]:
+    async def get_all_links_by_user_id(self, user_id: int) -> SUserResponseWithLinks:
         try:
             stmt = (
                 select(User)
@@ -150,7 +157,7 @@ class UserRepository(AbstractRepository):
                 .options(selectinload(Link.clicks))
             )
             result = await self.session.execute(stmt)
-            return list(result.scalars().all())
+            return SUserResponseWithLinks.model_validate(list(result.scalars().all()))
 
         except NoResultFound:
             logger.warning(f"User with id {user_id} does not exists")

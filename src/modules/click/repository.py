@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 
 from src.modules.click.models import Click
 from src.modules.click.schemas import SClickCreate
-from src.core.exceptions_factory import exception_factory
+from src.core.exception_factory import exception_factory
 
 
 logger = logging.getLogger(__name__)

@@ -22,7 +22,7 @@ class SUserResponse(SUserCreate):
     updated_at: datetime
 
 
-class SUserGetWithLinks(SUserResponse):
+class SUserResponseWithLinks(SUserResponse):
     links: list["SLinkResponse"] = []
 
 
