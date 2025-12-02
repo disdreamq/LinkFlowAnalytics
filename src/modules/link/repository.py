@@ -7,9 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 from sqlalchemy.orm import selectinload, joinedload
 
 from src.core.exceptions_factory import exception_factory
-from src.entities.link.models import Link
-from src.entities.link.schemas import SLinkCreate, SLinkResponse
-from src.services.link_service import url_generator
+from src.modules.link.models import Link
+from src.modules.link.schemas import SLinkCreate, SLinkResponse
+from modules.link.service import url_generator
 
 logger = logging.getLogger(__name__)
 

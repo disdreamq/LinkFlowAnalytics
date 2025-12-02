@@ -7,9 +7,9 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 from sqlalchemy.orm import selectinload
 
 from src.core.exceptions_factory import exception_factory
-from src.entities.link.models import Link
-from src.entities.user.models import User
-from src.entities.user.schemas import SUserCreate, SUserUpdate
+from src.modules.link.models import Link
+from src.modules.user.models import User
+from src.modules.user.schemas import SUserCreate, SUserUpdate
 
 logger = logging.getLogger(__name__)
 

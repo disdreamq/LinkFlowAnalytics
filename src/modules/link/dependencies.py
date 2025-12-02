@@ -2,8 +2,8 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.entities.dependencies import get_session
-from src.entities.link.repository import LinkRepository
+from src.modules.dependencies import get_session
+from src.modules.link.repository import LinkRepository
 
 
 async def get_link_repository(

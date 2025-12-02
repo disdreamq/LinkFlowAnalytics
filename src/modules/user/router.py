@@ -3,9 +3,9 @@ from fastapi import APIRouter, status
 from fastapi.params import Depends
 import logging
 
-from src.entities.user.dependencies import get_user_repository
-from src.entities.user.schemas import SUserCreate, SUserGet, SUserUpdate
-from src.entities.user.repository import UserRepository
+from src.modules.user.dependencies import get_user_repository
+from src.modules.user.schemas import SUserCreate, SUserResponse, SUserUpdate
+from src.modules.user.repository import UserRepository
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/users", tags=["users"])
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.post(
     "/",
-    response_model=SUserGet,
+    response_model=SUserResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create new user",
     responses={
@@ -31,7 +31,7 @@ async def create_user(
 
 @router.get(
     "/{user_id}",
-    response_model=SUserGet,
+    response_model=SUserResponse,
     status_code=status.HTTP_200_OK,
     summary="Get user by id",
     responses={
@@ -44,7 +44,7 @@ async def get_user(
     user_id: int, repo: Annotated[UserRepository, Depends(get_user_repository)]
 ):
     user = await repo.get_user_by_id(user_id)
-    return SUserGet.model_validate(user)
+    return SUserResponse.model_validate(user)
 
 
 @router.put(

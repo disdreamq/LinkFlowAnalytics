@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict, HttpUrl
 
 if TYPE_CHECKING:
-    from src.entities.click.schemas import SClickGet
-    from src.entities.user.schemas import SUserGet
+    from src.modules.click.schemas import SClickResponse
+    from src.modules.user.schemas import SUserResponse
 
 
 class SLinkCreate(BaseModel):
@@ -24,13 +24,13 @@ class SLinkResponse(SLinkCreate):
 
 
 class SLinkWithUser(SLinkResponse):
-    user: "SUserGet"
+    user: "SUserResponse"
 
 
 class SLinkWithClicks(SLinkResponse):
-    clicks: list["SClickGet"] = []
+    clicks: list["SClickResponse"] = []
 
 
 class SLinkFull(SLinkResponse):
-    user: "SUserGet"
-    clicks: list["SClickGet"] = []
+    user: "SUserResponse"
+    clicks: list["SClickResponse"] = []

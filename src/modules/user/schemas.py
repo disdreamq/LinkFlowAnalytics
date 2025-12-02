@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 from src.enums.enums import UserTarifPlan
 
 if TYPE_CHECKING:
-    from src.entities.link.schemas import SLinkResponse
+    from src.modules.link.schemas import SLinkResponse
 
 
 class SUserCreate(BaseModel):
@@ -13,7 +13,7 @@ class SUserCreate(BaseModel):
     password: str
 
 
-class SUserGet(SUserCreate):
+class SUserResponse(SUserCreate):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -22,7 +22,7 @@ class SUserGet(SUserCreate):
     updated_at: datetime
 
 
-class SUserGetWithLinks(SUserGet):
+class SUserGetWithLinks(SUserResponse):
     links: list["SLinkResponse"] = []
 
 

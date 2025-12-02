@@ -4,8 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 
-from src.entities.click.models import Click
-from src.entities.click.schemas import SClickCreate
+from src.modules.click.models import Click
+from src.modules.click.schemas import SClickCreate
 from src.core.exceptions_factory import exception_factory
 
 

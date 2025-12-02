@@ -5,9 +5,9 @@ import logging
 
 from pydantic import HttpUrl
 
-from src.entities.link.dependencies import get_link_repository
-from src.entities.link.schemas import SLinkCreate, SLinkResponse
-from src.entities.link.repository import LinkRepository
+from src.modules.link.dependencies import get_link_repository
+from src.modules.link.schemas import SLinkCreate, SLinkResponse
+from src.modules.link.repository import LinkRepository
 
 
 logger = logging.getLogger(__name__)

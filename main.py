@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import uvicorn
-from src.entities import router
+from src.modules import router
 
 import src.db.init_models # noqa
 
