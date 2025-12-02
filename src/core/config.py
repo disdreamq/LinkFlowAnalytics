@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     postgres_user: str = ""
     postgres_password: str = ""
 
+    @property
+    def db_url(self) -> str:
+        return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+
     # Redis
     redis_database: int = 0
     redis_host: str = ""
@@ -24,17 +28,17 @@ class Settings(BaseSettings):
     redis_username: str = ""
     redis_password: str = ""
 
-    # CORS
-    CORS_ORIGINS: list[str] = []
-
-    @property
-    def db_url(self) -> str:
-        return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
-    
     @property
     def redis_url(self) -> str:
         return f"redis://:{self.redis_password}@{self.redis_host}:{self.redis_port}/{self.redis_database}"
-    
+
+    # Auth
+    secret_key: str = ""
+    alghoritm: str = ""
+
+    # CORS
+    CORS_ORIGINS: list[str] = []
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
