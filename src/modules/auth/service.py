@@ -9,7 +9,7 @@ from src.core.config import get_settings
 from src.modules.auth.schemas import STokenResponse, TokenData
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
-from src.modules.user.schemas import SUserInDB
+from src.modules.user.schemas import SUserInDB, SUserResponse
 from src.core.exception_factory import exception_factory
 from src.core.security import password_hash
 
@@ -51,7 +51,7 @@ def create_access_token(
 async def get_current_user(
     repo: Annotated[UserRepository, Depends(get_user_repository)],
     token: Annotated[str, Depends(_oauth2_scheme)],
-) -> SUserInDB:
+) -> SUserResponse:
     try:
         payload = jwt.decode(
             token, get_settings().secret_key, algorithms=[get_settings().alghoritm]
@@ -68,4 +68,4 @@ async def get_current_user(
     user = await repo.get_user_by_email(token_data.username)
     if user is None:
         raise exception_factory.unauthorized()
-    return user
+    return SUserResponse.model_validate(user)
