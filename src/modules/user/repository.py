@@ -13,7 +13,7 @@ from src.modules.user.models import User
 from src.modules.user.schemas import (
     SUserCreate,
     SUserInDB,
-    SUserResponseWithLinks,
+    SUserInDBWithLinks,
     SUserUpdate,
 )
 
@@ -114,11 +114,10 @@ class UserRepository(AbstractRepository):
 
     async def update_user(
         self,
-        user_id: int,
         user_to_update: SUserUpdate,
     ) -> SUserInDB:
         try:
-            user = await self.get_user_by_id(user_id)
+            user = await self.get_user_by_id(user_to_update.id)
             for key, value in user_to_update.model_dump(
                 exclude_unset=True,
                 exclude_none=True,
@@ -128,18 +127,18 @@ class UserRepository(AbstractRepository):
                         setattr(user, key, value)
                     else:
                         setattr(user, key, get_password_hash(value))
-                        
+
             self.session.add(user)
             await self.session.refresh(user, attribute_names=["updated_at"])
             return SUserInDB.model_validate(user)
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding: {e}")
-            raise exception_factory.database_error(user_id)
+            raise exception_factory.database_error(user_to_update.id)
 
         except Exception as e:
             logger.critical(f"Unexpected error while adding: {e}")
-            raise exception_factory.unexpected_error({"id": user_id})
+            raise exception_factory.unexpected_error({"id": user_to_update.id})
 
     async def delete_user(self, user_id: int) -> Literal[True]:
         try:
@@ -156,7 +155,7 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"id": user_id})
 
-    async def get_all_links_by_user_id(self, user_id: int) -> SUserResponseWithLinks:
+    async def get_all_links_by_user_id(self, user_id: int) -> SUserInDBWithLinks:
         try:
             stmt = (
                 select(User)
@@ -164,7 +163,7 @@ class UserRepository(AbstractRepository):
                 .options(selectinload(Link.clicks))
             )
             result = await self.session.execute(stmt)
-            return SUserResponseWithLinks.model_validate(list(result.scalars().all()))
+            return SUserInDBWithLinks.model_validate(list(result.scalars().all()))
 
         except NoResultFound:
             logger.warning(f"User with id {user_id} does not exists")
