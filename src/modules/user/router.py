@@ -4,7 +4,7 @@ from fastapi.params import Depends
 import logging
 
 from src.modules.user.dependencies import get_user_repository
-from src.modules.user.schemas import SUserCreate, SUserResponse, SUserUpdate
+from src.modules.user.schemas import SUserCreate, SUserInDB, SUserResponse, SUserUpdate
 from src.modules.user.repository import UserRepository
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ async def get_user(
 
 @router.put(
     "/{user_id}",
-    response_model=Literal[True],
+    response_model=SUserResponse,
     status_code=status.HTTP_200_OK,
     summary="Update user by id",
     responses={
@@ -65,12 +65,12 @@ async def update_user(
     repo: Annotated[UserRepository, Depends(get_user_repository)],
 ):
     user = await repo.update_user(user_id, new_user_data)
-    return user
+    return SUserResponse.model_validate(user)
 
 
 @router.patch(
     "/{user_id}",
-    response_model=Literal[True],
+    response_model=SUserResponse,
     status_code=status.HTTP_200_OK,
     summary="Update user by id",
     responses={
@@ -84,9 +84,9 @@ async def partically_update_user(
     user_id: int,
     new_user_data: SUserUpdate,
     repo: Annotated[UserRepository, Depends(get_user_repository)],
-) -> Literal[True]:
+) -> SUserResponse:
     user = await repo.update_user(user_id, new_user_data)
-    return user
+    return SUserResponse.model_validate(user)
 
 
 @router.delete(

@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, HttpUrl
 
 if TYPE_CHECKING:
     from src.modules.click.schemas import SClickResponse
-    from src.modules.user.schemas import SUserResponse
+    from src.modules.user.schemas import SUserInDB
 
 
 class SLinkCreate(BaseModel):
@@ -24,7 +24,7 @@ class SLinkResponse(SLinkCreate):
 
 
 class SLinkWithUser(SLinkResponse):
-    user: "SUserResponse"
+    user: "SUserInDB"
 
 
 class SLinkWithClicks(SLinkResponse):
@@ -32,5 +32,5 @@ class SLinkWithClicks(SLinkResponse):
 
 
 class SLinkFull(SLinkResponse):
-    user: "SUserResponse"
+    user: "SUserInDB"
     clicks: list["SClickResponse"] = []

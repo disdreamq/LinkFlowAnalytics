@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
-from pydantic import BaseModel, ConfigDict
+from typing import TYPE_CHECKING, Annotated, Optional
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from src.enums.enums import UserTarifPlan
 
@@ -9,14 +9,32 @@ if TYPE_CHECKING:
 
 
 class SUserCreate(BaseModel):
-    email: str  # emailvalidator
-    password: str
+    email: EmailStr
+    password: Annotated[str, Field(min_length=8)]
 
 
-class SUserResponse(SUserCreate):
+class SUserInDB(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    email: str
+    password: str
+    tarifplan: UserTarifPlan
+    created_at: datetime
+    updated_at: datetime
+
+
+class SUserUpdate(SUserCreate):
+    email: Optional[str] = None
+    password: Optional[str] = None
+    tarifplan: Optional[UserTarifPlan] = None
+
+
+class SUserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: str
     tarifplan: UserTarifPlan
     created_at: datetime
     updated_at: datetime
@@ -24,9 +42,3 @@ class SUserResponse(SUserCreate):
 
 class SUserResponseWithLinks(SUserResponse):
     links: list["SLinkResponse"] = []
-
-
-class SUserUpdate(SUserCreate):
-    email: Optional[str] = None
-    password: Optional[str] = None
-    tarifplan: Optional[UserTarifPlan] = None

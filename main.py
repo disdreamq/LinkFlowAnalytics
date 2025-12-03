@@ -4,10 +4,10 @@ from fastapi import FastAPI
 from src.modules import router
 import src.db.init_models  # noqa
 
+app = FastAPI()
+app.include_router(router)
 
 def main():
-    app = FastAPI()
-    app.include_router(router)
     uvicorn.run(
         "main:app",
         host="0.0.0.0",

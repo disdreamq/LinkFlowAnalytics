@@ -10,7 +10,12 @@ from src.core.exception_factory import exception_factory
 from src.core.security import get_password_hash
 from src.modules.link.models import Link
 from src.modules.user.models import User
-from src.modules.user.schemas import SUserCreate, SUserResponse, SUserResponseWithLinks, SUserUpdate
+from src.modules.user.schemas import (
+    SUserCreate,
+    SUserInDB,
+    SUserResponseWithLinks,
+    SUserUpdate,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -37,21 +42,21 @@ class UserRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_user(self, user: SUserCreate) -> SUserResponse:
+    async def create_user(self, user: SUserCreate) -> SUserInDB:
         try:
             if await self.get_user_by_email(user.email) is not None:
                 logger.error(
                     f"Unique email error while adding user with email {user.email}"
                 )
                 raise exception_factory.already_exists(user.email)
-            
+
             user_dict = user.model_dump()
             user_dict["password"] = get_password_hash(user_dict["password"])
             user_to_create = User(**user_dict)
             self.session.add(user_to_create)
-            
+
             await self.session.flush()
-            return SUserResponse.model_validate(user_to_create)
+            return SUserInDB.model_validate(user_to_create)
 
         except IntegrityError as e:
             logger.error(f"Integrity error while adding user: {e}")
@@ -67,12 +72,12 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"user": user})
 
-    async def get_user_by_id(self, user_id: int) -> SUserResponse:
+    async def get_user_by_id(self, user_id: int) -> User:
         try:
             stmt = select(User).filter(User.id == user_id)
             result = await self.session.execute(stmt)
             user = result.scalar_one()
-            return SUserResponse.model_validate(user)
+            return user
 
         except NoResultFound:
             logger.warning(f"User with id {user_id} does not exists")
@@ -86,14 +91,14 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"user_id": user_id})
 
-    async def get_user_by_email(self, email: str) -> Optional[SUserResponse]:
+    async def get_user_by_email(self, email: str) -> Optional[SUserInDB]:
         try:
             stmt = select(User).filter(User.email == email)
             result = await self.session.execute(stmt)
             user = result.scalar_one_or_none()
             if not user:
                 return None
-            return SUserResponse.model_validate(user)
+            return SUserInDB.model_validate(user)
 
         except NoResultFound:
             logger.warning(f"User with email {email} does not exists")
@@ -109,22 +114,24 @@ class UserRepository(AbstractRepository):
 
     async def update_user(
         self,
-        user_id: int, 
+        user_id: int,
         user_to_update: SUserUpdate,
-    ) -> Literal[True]:
+    ) -> SUserInDB:
         try:
-            user = self.get_user_by_id(user_id)
-
+            user = await self.get_user_by_id(user_id)
             for key, value in user_to_update.model_dump(
                 exclude_unset=True,
                 exclude_none=True,
             ).items():
                 if hasattr(user, key):
-                    setattr(user, key, value)
-
+                    if key != 'password':
+                        setattr(user, key, value)
+                    else:
+                        setattr(user, key, get_password_hash(value))
+                        
             self.session.add(user)
-            await self.session.flush()
-            return True
+            await self.session.refresh(user, attribute_names=["updated_at"])
+            return SUserInDB.model_validate(user)
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding: {e}")
@@ -136,7 +143,7 @@ class UserRepository(AbstractRepository):
 
     async def delete_user(self, user_id: int) -> Literal[True]:
         try:
-            user_to_delete = self.get_user_by_id(user_id)
+            user_to_delete = await self.get_user_by_id(user_id)
 
             await self.session.delete(user_to_delete)
             return True

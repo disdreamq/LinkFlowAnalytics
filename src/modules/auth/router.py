@@ -4,12 +4,17 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.modules.auth.schemas import STokenResponse
-from src.modules.auth.service import authenticate_user, create_access_token, get_current_user
+from src.modules.auth.service import (
+    authenticate_user,
+    create_access_token,
+    get_current_user,
+)
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
-from src.modules.user.schemas import SUserResponse
+from src.modules.user.schemas import SUserInDB
 
 router = APIRouter()
+
 
 @router.post("/token")
 async def login_for_access_token(
@@ -26,6 +31,6 @@ async def login_for_access_token(
 
 @router.get("/aaaaa/me")
 async def read_user_me(
-    current_user: Annotated[SUserResponse, Depends(get_current_user)],
+    current_user: Annotated[SUserInDB, Depends(get_current_user)],
 ):
     return current_user
