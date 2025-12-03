@@ -24,7 +24,8 @@ class SUserInDB(BaseModel):
     updated_at: datetime
 
 
-class SUserUpdate(SUserCreate):
+class SUserUpdate(BaseModel):
+    id: int
     email: Optional[str] = None
     password: Optional[str] = None
     tarifplan: Optional[UserTarifPlan] = None
@@ -40,5 +41,5 @@ class SUserResponse(BaseModel):
     updated_at: datetime
 
 
-class SUserResponseWithLinks(SUserResponse):
+class SUserInDBWithLinks(SUserInDB):
     links: list["SLinkResponse"] = []
