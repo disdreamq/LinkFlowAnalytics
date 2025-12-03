@@ -19,6 +19,7 @@ class SLinkResponse(SLinkCreate):
     user_id: int
     base_url: str
     url: str
+    click_counter: int
     created_at: datetime
     updated_at: datetime
 
