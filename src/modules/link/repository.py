@@ -38,7 +38,7 @@ class LinkRepository(AbstractRepository):
             link_dict = link.model_dump()
             link_dict['base_url'] = str(link_dict['base_url'])
             link_to_create = Link(**link_dict, url=short_url)
-            
+
             self.session.add(link_to_create)
             await self.session.flush()
             return SLinkResponse.model_validate(link_to_create)
@@ -75,11 +75,11 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link_url": base_url})
 
-    async def get_link_by_id(self, link_id: int) -> SLinkResponse:
+    async def get_link_by_id(self, link_id: int) -> Link:
         try:
             stmt = select(Link).filter(Link.id == link_id)
             result = await self.session.execute(stmt)
-            return SLinkResponse.model_validate(result.scalar_one())
+            return result.scalar_one()
 
         except NoResultFound:
             logger.warning(f"Link with id {link_id} does not exists")
@@ -157,9 +157,31 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link_id": link_id})
 
+    async def update_link(self, link_to_update: SLinkResponse) -> SLinkResponse:
+        try:
+            link_from_db = await self.get_link_by_id(link_to_update.id)
+            for key, value in link_to_update.model_dump(
+                exclude_unset=True,
+                exclude_none=True,
+                ).items():
+                if hasattr(link_from_db, key):
+                    setattr(link_from_db, key, value)
+
+            self.session.add(link_from_db)
+            await self.session.flush()
+            return SLinkResponse.model_validate(link_from_db)
+
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while updating link: {e}")
+            raise exception_factory.database_error(link_to_update)
+
+        except Exception as e:
+            logger.critical(f"Unexpected error while updating link: {e}")
+            raise exception_factory.unexpected_error({"link": link_to_update})
+
     async def delete_link(self, link_id: int) -> Literal[True]:
         try:
-            link_to_delete = self.get_link_by_id(link_id)
+            link_to_delete = await self.get_link_by_id(link_id)
             await self.session.delete(link_to_delete)
             return True
 
@@ -170,3 +192,42 @@ class LinkRepository(AbstractRepository):
         except Exception as e:
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link_id": link_id})
+
+    async def get_multiple_links_by_ids(self, link_ids: list[int]) -> list[Link]:
+        try:
+            stmt = (
+                select(Link).filter(Link.id.in_(link_ids))
+                .order_by(Link.id)
+            )
+            result = await self.session.execute(stmt)
+            return list(result.scalars().all())
+
+        except NoResultFound:
+            logger.warning(f"Link with id {link_ids} does not exists")
+            raise exception_factory.not_found(resource="links", identifier=link_ids)
+
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while adding links: {e}")
+            raise exception_factory.database_error(link_ids)
+
+        except Exception as e:
+            logger.critical(f"Unexpected error while adding links: {e}")
+            raise exception_factory.unexpected_error({"link_id": link_ids})
+
+    async def increment_click_counter(self, links_data: dict[int, int]) -> list[SLinkResponse]:
+        try:
+            links_from_db = await self.get_multiple_links_by_ids(list(links_data.keys()))
+
+            for link in links_from_db:
+                link.click_counter += links_data[link.id]
+                self.session.add(link)
+
+            return [SLinkResponse.model_validate(link) for link in links_from_db]
+
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while incrementing click_counter for links: {e}")
+            raise exception_factory.database_error(links_data)
+
+        except Exception as e:
+            logger.critical(f"Unexpected error while adding link: {e}")
+            raise exception_factory.unexpected_error({"links_data": links_data})
