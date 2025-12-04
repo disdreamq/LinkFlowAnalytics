@@ -1,13 +1,16 @@
+from datetime import datetime
 from typing import Annotated
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, BackgroundTasks, Request
 from fastapi.responses import RedirectResponse
 import logging
 
-from pydantic import HttpUrl
 
+from src.redis.click_buffer import get_buffer
+from src.modules.click.schemas import SClickCreate
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.schemas import SLinkCreate, SLinkResponse
 from src.modules.link.repository import LinkRepository
+from src.redis.click_buffer import ClickBuffer
 
 
 logger = logging.getLogger(__name__)
@@ -46,7 +49,20 @@ async def create_link(
     },
 )
 async def redirect(
-    url: HttpUrl, repo: Annotated[LinkRepository, Depends(get_link_repository)]
+    url: str,
+    repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    buffer: Annotated[ClickBuffer, Depends(get_buffer)],
+    background_tasks: BackgroundTasks,
+    request: Request,
 ):
-    link = await repo.get_link_by_base_url(str(url))
+    user_agent = request.headers.get("user-agent", "Unknown")
+    user_ip = request.client.host if request.client else None
+    link = await repo.get_link_by_url(str(url))
+    new_click = SClickCreate(
+        link_id=link.id,
+        user_agent=user_agent,
+        user_ip=user_ip if user_ip else None,
+        created_at=datetime.now(),
+    )
+    background_tasks.add_task(buffer.add_click, new_click)
     return RedirectResponse(link.base_url)
