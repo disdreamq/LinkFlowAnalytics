@@ -36,7 +36,7 @@ class LinkRepository(AbstractRepository):
         try:
             short_url = await url_generator.get_url()
             link_dict = link.model_dump()
-            link_dict['base_url'] = str(link_dict['base_url'])
+            link_dict["base_url"] = str(link_dict["base_url"])
             link_to_create = Link(**link_dict, url=short_url)
 
             self.session.add(link_to_create)
@@ -57,23 +57,23 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link": link})
 
-    async def get_link_by_base_url(self, base_url: str) -> SLinkResponse:
+    async def get_link_by_url(self, url: str) -> SLinkResponse:
         try:
-            stmt = select(Link).filter(Link.url == base_url)
+            stmt = select(Link).filter(Link.url == url)
             result = await self.session.execute(stmt)
             return SLinkResponse.model_validate(result.scalar_one())
 
         except NoResultFound:
-            logger.warning(f"Link with id {base_url} does not exists")
-            raise exception_factory.not_found(resource="link", identifier=base_url)
+            logger.warning(f"Link with id {url} does not exists")
+            raise exception_factory.not_found(resource="link", identifier=url)
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding link: {e}")
-            raise exception_factory.database_error(base_url)
+            raise exception_factory.database_error(url)
 
         except Exception as e:
             logger.critical(f"Unexpected error while adding link: {e}")
-            raise exception_factory.unexpected_error({"link_url": base_url})
+            raise exception_factory.unexpected_error({"link_url": url})
 
     async def get_link_by_id(self, link_id: int) -> Link:
         try:
@@ -163,7 +163,7 @@ class LinkRepository(AbstractRepository):
             for key, value in link_to_update.model_dump(
                 exclude_unset=True,
                 exclude_none=True,
-                ).items():
+            ).items():
                 if hasattr(link_from_db, key):
                     setattr(link_from_db, key, value)
 
@@ -195,10 +195,7 @@ class LinkRepository(AbstractRepository):
 
     async def get_multiple_links_by_ids(self, link_ids: list[int]) -> list[Link]:
         try:
-            stmt = (
-                select(Link).filter(Link.id.in_(link_ids))
-                .order_by(Link.id)
-            )
+            stmt = select(Link).filter(Link.id.in_(link_ids)).order_by(Link.id)
             result = await self.session.execute(stmt)
             return list(result.scalars().all())
 
@@ -214,9 +211,13 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding links: {e}")
             raise exception_factory.unexpected_error({"link_id": link_ids})
 
-    async def increment_click_counter(self, links_data: dict[int, int]) -> list[SLinkResponse]:
+    async def increment_click_counter(
+        self, links_data: dict[int, int]
+    ) -> list[SLinkResponse]:
         try:
-            links_from_db = await self.get_multiple_links_by_ids(list(links_data.keys()))
+            links_from_db = await self.get_multiple_links_by_ids(
+                list(links_data.keys())
+            )
 
             for link in links_from_db:
                 link.click_counter += links_data[link.id]
@@ -225,7 +226,9 @@ class LinkRepository(AbstractRepository):
             return [SLinkResponse.model_validate(link) for link in links_from_db]
 
         except SQLAlchemyError as e:
-            logger.error(f"Database error while incrementing click_counter for links: {e}")
+            logger.error(
+                f"Database error while incrementing click_counter for links: {e}"
+            )
             raise exception_factory.database_error(links_data)
 
         except Exception as e:

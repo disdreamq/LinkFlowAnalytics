@@ -60,11 +60,10 @@ async def get_user(
     },
 )
 async def update_user(
-    user_id: int,
     new_user_data: SUserUpdate,
     repo: Annotated[UserRepository, Depends(get_user_repository)],
 ):
-    user = await repo.update_user(user_id, new_user_data)
+    user = await repo.update_user(new_user_data)
     return SUserResponse.model_validate(user)
 
 
@@ -81,11 +80,10 @@ async def update_user(
     },
 )
 async def partically_update_user(
-    user_id: int,
     new_user_data: SUserUpdate,
     repo: Annotated[UserRepository, Depends(get_user_repository)],
 ) -> SUserResponse:
-    user = await repo.update_user(user_id, new_user_data)
+    user = await repo.update_user(new_user_data)
     return SUserResponse.model_validate(user)
 
 

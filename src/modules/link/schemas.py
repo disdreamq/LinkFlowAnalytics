@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict, HttpUrl
 
 if TYPE_CHECKING:
-    from src.modules.click.schemas import SClickResponse
+    from src.modules.click.schemas import SClickInDB
     from src.modules.user.schemas import SUserInDB
 
 
@@ -29,9 +29,9 @@ class SLinkWithUser(SLinkResponse):
 
 
 class SLinkWithClicks(SLinkResponse):
-    clicks: list["SClickResponse"] = []
+    clicks: list["SClickInDB"] = []
 
 
 class SLinkFull(SLinkResponse):
     user: "SUserInDB"
-    clicks: list["SClickResponse"] = []
+    clicks: list["SClickInDB"] = []
