@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload, joinedload
 
 from src.core.exception_factory import exception_factory
 from src.modules.link.models import Link
-from src.modules.link.schemas import SLinkCreate, SLinkResponse
+from src.modules.link.schemas import SLinkCreateInDB, SLinkResponse
 from src.modules.link.service import url_generator
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class LinkRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_link(self, link: SLinkCreate) -> SLinkResponse:
+    async def create_link(self, link: SLinkCreateInDB) -> SLinkResponse:
         try:
             short_url = await url_generator.get_url()
             link_dict = link.model_dump()
@@ -179,19 +179,20 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while updating link: {e}")
             raise exception_factory.unexpected_error({"link": link_to_update})
 
-    async def delete_link(self, link_id: int) -> Literal[True]:
+    async def delete_link(self, link_url: str) -> Literal[True]:
         try:
-            link_to_delete = await self.get_link_by_id(link_id)
+            link_to_delete_id = (await self.get_link_by_url(link_url)).id
+            link_to_delete = await self.get_link_by_id(link_to_delete_id)
             await self.session.delete(link_to_delete)
             return True
 
         except SQLAlchemyError as e:
-            logger.error(f"Database error while adding link: {e}")
-            raise exception_factory.database_error(link_id)
+            logger.error(f"Database error while deleting link: {e}")
+            raise exception_factory.database_error(link_url)
 
         except Exception as e:
-            logger.critical(f"Unexpected error while adding link: {e}")
-            raise exception_factory.unexpected_error({"link_id": link_id})
+            logger.critical(f"Unexpected error while deleting link: {e}")
+            raise exception_factory.unexpected_error({"link_url": link_url})
 
     async def get_multiple_links_by_ids(self, link_ids: list[int]) -> list[Link]:
         try:
