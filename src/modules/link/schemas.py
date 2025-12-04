@@ -8,11 +8,14 @@ if TYPE_CHECKING:
 
 
 class SLinkCreate(BaseModel):
-    user_id: int
     base_url: HttpUrl
 
 
-class SLinkResponse(SLinkCreate):
+class SLinkCreateInDB(SLinkCreate):
+    user_id: int
+
+
+class SLinkResponse(SLinkCreateInDB):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

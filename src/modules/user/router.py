@@ -102,5 +102,5 @@ async def delete_user(
     user_id: int,
     repo: Annotated[UserRepository, Depends(get_user_repository)],
 ):
-    user = await repo.delete_user(user_id)
-    return user
+    await repo.delete_user(user_id)
+    return 
