@@ -40,8 +40,8 @@ class ClickBuffer:
             )
 
         self.counter += 1
-        await self.redis.set('buffer_counter', self.counter)
-        logger.warning(f'added click {click}, {res=}')
+        await self.redis.set("buffer_counter", self.counter)
+        logger.warning(f"added click {click}, {res=}")
 
         if self.counter >= 10:
             await self.write_buffer_to_bd()
@@ -54,15 +54,16 @@ class ClickBuffer:
         clicks_dict = get_increments_for_links(clicks_in_db)
         await self.link_repo.increment_click_counter(clicks_dict)
         self.counter = 0
-        await self.redis.set('buffer_counter', self.counter)
+        await self.redis.set("buffer_counter", self.counter)
         await self.redis.delete("buffered_clicks")
 
-        logger.info(f'Clicks {clicks} added to database')
+        logger.info(f"Clicks {clicks} added to database")
 
     async def initialize(self):
-        counter_in_redis = await self.redis.get('buffer_counter')
+        counter_in_redis = await self.redis.get("buffer_counter")
         self.counter = int(counter_in_redis) if counter_in_redis else 0
-        self.ready = True 
+        self.ready = True
+
 
 async def get_buffer(
     click_repo: Annotated[ClickRepository, Depends(get_click_repository)],

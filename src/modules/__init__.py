@@ -17,4 +17,3 @@ from .click.models import Click
 
 
 __all__ = ["User", "Link", "Click"]
-

@@ -13,7 +13,7 @@ from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
 from src.modules.user.schemas import SUserInDB
 
-router = APIRouter(tags=['auth'])
+router = APIRouter(tags=["auth"])
 
 
 @router.post("/token")

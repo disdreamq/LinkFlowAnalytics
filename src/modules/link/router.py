@@ -58,7 +58,7 @@ async def get_link_by_short_url(
     if link.user_id == current_user.id:
         return link
     else:
-        raise exception_factory.not_found('link id', '{link.id}')
+        raise exception_factory.not_found("link id", "{link.id}")
 
 
 @router.delete(

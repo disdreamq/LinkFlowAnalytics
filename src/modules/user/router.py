@@ -103,4 +103,4 @@ async def delete_user(
     repo: Annotated[UserRepository, Depends(get_user_repository)],
 ):
     await repo.delete_user(user_id)
-    return 
+    return
