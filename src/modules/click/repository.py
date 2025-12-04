@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from src.modules.click.models import Click
 from src.modules.link.models import Link
-from src.modules.click.schemas import SClickCreate, SClickResponse, SClickWithLink
+from src.modules.click.schemas import SClickCreate, SClickInDB, SClickInDBWithLink
 from src.core.exception_factory import exception_factory
 
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class AbstractRepository(ABC):
     @abstractmethod
-    async def create_click():
+    async def create_clicks():
         raise NotImplementedError
 
     @abstractmethod
@@ -28,10 +28,13 @@ class ClickRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_click(self, click: SClickCreate):
+    async def create_clicks(self, clicks: list[SClickCreate]) -> list[SClickCreate]:
         try:
-            click_to_create = Click(**click.model_dump())
-            self.session.add(click_to_create)
+            for click in clicks:
+                click_to_create = Click(**click.model_dump())
+                self.session.add(click_to_create)
+            await self.session.flush()
+            return [SClickCreate.model_validate(click) for click in clicks]
 
         except IntegrityError as e:
             logger.error(f"Integrity error while adding user: {e}")
@@ -47,11 +50,11 @@ class ClickRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"click": click})
 
-    async def get_click(self, click_id: int) -> SClickResponse:
+    async def get_click(self, click_id: int) -> SClickInDB:
         try:
             stmt = select(Click).where(Click.id == click_id)
             result = await self.session.execute(stmt)
-            return SClickResponse.model_validate(result.scalar_one())
+            return SClickInDB.model_validate(result.scalar_one())
 
         except NoResultFound:
             logger.warning(f"Click with id {click_id} does not exists")
@@ -66,19 +69,17 @@ class ClickRepository(AbstractRepository):
             raise exception_factory.unexpected_error({"click": click_id})
 
 
-async def get_click_with_link(self, click_id: int) -> SClickWithLink:
+async def get_click_with_link(self, click_id: int) -> SClickInDBWithLink:
     try:
         stmt = (
-            select(Click)
-            .where(Click.id == click_id)
-            .options(selectinload(Link.clicks))
+            select(Click).where(Click.id == click_id).options(selectinload(Link.clicks))
         )
         result = await self.session.execute(stmt)
         click = result.scalar_one()
-        return SClickWithLink.model_validate(click) 
+        return SClickInDBWithLink.model_validate(click)
     except NoResultFound:
-            logger.warning(f"Click with id {click_id} does not exists")
-            raise exception_factory.not_found(resource="click", identifier=click_id)
+        logger.warning(f"Click with id {click_id} does not exists")
+        raise exception_factory.not_found(resource="click", identifier=click_id)
 
     except SQLAlchemyError as e:
         logger.error(f"Database error while adding: {e}")
@@ -86,4 +87,4 @@ async def get_click_with_link(self, click_id: int) -> SClickWithLink:
 
     except Exception as e:
         logger.critical(f"Unexpected error while adding: {e}")
-        raise exception_factory.unexpected_error({"click": click_id}) 
+        raise exception_factory.unexpected_error({"click": click_id})
