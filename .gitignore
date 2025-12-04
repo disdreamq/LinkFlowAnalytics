@@ -4,4 +4,3 @@ __pycache__
 .postgres_data
 .redis_data
 .pgadmin_data
-test.py
