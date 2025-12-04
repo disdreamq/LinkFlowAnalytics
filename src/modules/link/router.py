@@ -1,20 +1,18 @@
-from datetime import datetime
 from typing import Annotated
-from fastapi import APIRouter, Depends, status, BackgroundTasks, Request
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends, status
 import logging
 
 
-from src.redis.click_buffer import get_buffer
-from src.modules.click.schemas import SClickCreate
+from src.core.exception_factory import exception_factory
+from src.modules.auth.service import get_current_user
 from src.modules.link.dependencies import get_link_repository
-from src.modules.link.schemas import SLinkCreate, SLinkResponse
+from src.modules.link.schemas import SLinkCreate, SLinkCreateInDB, SLinkResponse
 from src.modules.link.repository import LinkRepository
-from src.redis.click_buffer import ClickBuffer
+from src.modules.user.schemas import SUserInDB
 
 
 logger = logging.getLogger(__name__)
-router = APIRouter(tags=["links"])
+router = APIRouter(prefix="/links", tags=["links"])
 
 
 @router.post(
@@ -32,37 +30,57 @@ router = APIRouter(tags=["links"])
 async def create_link(
     link: SLinkCreate,
     repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    current_user: Annotated[SUserInDB, Depends(get_current_user)],
 ):
-    new_link = await repo.create_link(link)
+    link_to_create = SLinkCreateInDB(**link.model_dump(), user_id=current_user.id)
+    new_link = await repo.create_link(link_to_create)
     return new_link
 
 
 @router.get(
-    "/{url}",
-    response_class=RedirectResponse,
-    status_code=status.HTTP_307_TEMPORARY_REDIRECT,
-    summary="Redirect to original URL",
-    description="Redirect to original URL from short URL",
+    "/",
+    response_model=SLinkResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get info about link",
+    description="Get base_url, url and click_counter for link ",
     responses={
-        307: {"description": "Redirect to original URL"},
-        404: {"description": "Short URL not found"},
+        200: {"description": "Link successfully found"},
+        404: {"description": "Link not found"},
+        500: {"description": "Internal server error"},
     },
 )
-async def redirect(
-    url: str,
+async def get_link_by_short_url(
+    link_url: str,
     repo: Annotated[LinkRepository, Depends(get_link_repository)],
-    buffer: Annotated[ClickBuffer, Depends(get_buffer)],
-    background_tasks: BackgroundTasks,
-    request: Request,
+    current_user: Annotated[SUserInDB, Depends(get_current_user)],
 ):
-    user_agent = request.headers.get("user-agent", "Unknown")
-    user_ip = request.client.host if request.client else None
-    link = await repo.get_link_by_url(str(url))
-    new_click = SClickCreate(
-        link_id=link.id,
-        user_agent=user_agent,
-        user_ip=user_ip if user_ip else None,
-        created_at=datetime.now(),
-    )
-    background_tasks.add_task(buffer.add_click, new_click)
-    return RedirectResponse(link.base_url)
+    link = await repo.get_link_by_url(link_url)
+    if link.user_id == current_user.id:
+        return link
+    else:
+        raise exception_factory.not_found('link id', '{link.id}')
+
+
+@router.delete(
+    "/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete link",
+    description="Delete link by short url",
+    responses={
+        204: {"description": "Link successfully deleted"},
+        400: {"description": "Invalid link provided"},
+        404: {"description": "Link not found"},
+        500: {"description": "Internal server error"},
+    },
+)
+async def delete_link(
+    link_url: str,
+    repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    current_user: Annotated[SUserInDB, Depends(get_current_user)],
+):
+    link = await repo.get_link_by_url(link_url)
+    if link.user_id == current_user.id:
+        await repo.delete_link(link_url)
+        return
+    else:
+        raise exception_factory.not_found("link id", "{link.id}")
