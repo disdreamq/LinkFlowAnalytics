@@ -1,10 +1,11 @@
 from __future__ import annotations
 from datetime import datetime
-from sqlalchemy import String, func, Enum
+from sqlalchemy import String, func
 from src.db.base import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.enums.enums import UserTarifPlan
+
 
 class User(Base):
     __tablename__ = "users"
@@ -22,6 +23,6 @@ class User(Base):
         server_default=func.now(), onupdate=func.now()
     )
 
-    links: Mapped[list['Link']] = relationship( # noqa #type: ignore
+    links: Mapped[list["Link"]] = relationship(  # noqa #type: ignore
         back_populates="user", cascade="all, delete-orphan"
     )

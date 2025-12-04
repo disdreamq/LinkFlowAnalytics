@@ -123,7 +123,7 @@ class UserRepository(AbstractRepository):
                 exclude_none=True,
             ).items():
                 if hasattr(user, key):
-                    if key != 'password':
+                    if key != "password":
                         setattr(user, key, value)
                     else:
                         setattr(user, key, get_password_hash(value))

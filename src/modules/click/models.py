@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey, func
 from src.db.base import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
+
 class Click(Base):
     __tablename__ = "clicks"
 

@@ -7,6 +7,6 @@ from src.modules.link.repository import LinkRepository
 
 
 async def get_link_repository(
-    session: Annotated[AsyncSession, Depends(get_session)]
+    session: Annotated[AsyncSession, Depends(get_session)],
 ) -> LinkRepository:
     return LinkRepository(session)

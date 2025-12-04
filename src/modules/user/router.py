@@ -1,10 +1,10 @@
-from typing import Annotated, Literal
+from typing import Annotated
 from fastapi import APIRouter, status
 from fastapi.params import Depends
 import logging
 
 from src.modules.user.dependencies import get_user_repository
-from src.modules.user.schemas import SUserCreate, SUserInDB, SUserResponse, SUserUpdate
+from src.modules.user.schemas import SUserCreate, SUserResponse, SUserUpdate
 from src.modules.user.repository import UserRepository
 
 logger = logging.getLogger(__name__)
