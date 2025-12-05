@@ -90,7 +90,7 @@ async def partically_update_user(
 @router.delete(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Delete user",
+    summary="Delete user by id",
     responses={
         204: {"description": "User successfully deleted"},
         400: {"description": "Invalid user provided"},

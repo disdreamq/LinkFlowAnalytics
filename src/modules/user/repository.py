@@ -44,7 +44,7 @@ class UserRepository(AbstractRepository):
 
     async def create_user(self, user: SUserCreate) -> SUserInDB:
         try:
-            if await self.get_user_by_email(user.email) is not None:
+            if await self.get_user_by_email(user.email) is not None: # TODO вынести из try и отдельно сделать все нормально (посмотреть update_user)
                 logger.error(
                     f"Unique email error while adding user with email {user.email}"
                 )
@@ -116,8 +116,8 @@ class UserRepository(AbstractRepository):
         self,
         user_to_update: SUserUpdate,
     ) -> SUserInDB:
+        user = await self.get_user_by_id(user_to_update.id)
         try:
-            user = await self.get_user_by_id(user_to_update.id)
             for key, value in user_to_update.model_dump(
                 exclude_unset=True,
                 exclude_none=True,
@@ -141,8 +141,8 @@ class UserRepository(AbstractRepository):
             raise exception_factory.unexpected_error({"id": user_to_update.id})
 
     async def delete_user(self, user_id: int) -> Literal[True]:
+        user_to_delete = await self.get_user_by_id(user_id)
         try:
-            user_to_delete = await self.get_user_by_id(user_id)
 
             await self.session.delete(user_to_delete)
             return True
