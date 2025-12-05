@@ -38,10 +38,10 @@ async def create_link(
 
 
 @router.get(
-    "/",
+    "/{link_url}",
     response_model=SLinkResponse,
     status_code=status.HTTP_200_OK,
-    summary="Get info about link",
+    summary="Get info about link by short url",
     description="Get base_url, url and click_counter for link ",
     responses={
         200: {"description": "Link successfully found"},
@@ -62,7 +62,7 @@ async def get_link_by_short_url(
 
 
 @router.delete(
-    "/",
+    "/{link_url}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete link",
     description="Delete link by short url",
