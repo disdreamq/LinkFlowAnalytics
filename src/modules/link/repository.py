@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload, joinedload
 
 from src.core.exception_factory import exception_factory
 from src.modules.link.models import Link
-from src.modules.link.schemas import SLinkCreateInDB, SLinkResponse
+from src.modules.link.schemas import SLinkCreateInDB, SLinkResponse, SLinkWithClicks
 from src.modules.link.service import url_generator
 
 logger = logging.getLogger(__name__)
@@ -113,7 +113,7 @@ class LinkRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding link: {e}")
             raise exception_factory.unexpected_error({"link_id": link_id})
 
-    async def get_link_with_clicks(self, link_id: int) -> SLinkResponse:
+    async def get_link_with_clicks(self, link_id: int) -> SLinkWithClicks:
         try:
             stmt = (
                 select(Link)
@@ -121,7 +121,7 @@ class LinkRepository(AbstractRepository):
                 .options(selectinload(Link.clicks))
             )
             result = await self.session.execute(stmt)
-            return SLinkResponse.model_validate(result.scalar_one())
+            return SLinkWithClicks.model_validate(result.scalar_one())
 
         except NoResultFound:
             logger.warning(f"Link with id {link_id} does not exists")

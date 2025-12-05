@@ -22,9 +22,9 @@ class ClickBuffer:
         max_lenght: int = 10,
     ):
         self.redis = redis
-        self.max_lenght = max_lenght
         self.click_repo = click_repo
         self.link_repo = link_repo
+        self.max_lenght = max_lenght
         self.counter = 0
         self.ready = False
 

@@ -155,7 +155,9 @@ class UserRepository(AbstractRepository):
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"id": user_id})
 
-    async def get_all_links_by_user_id(self, user_id: int) -> SUserInDBWithLinks:
+    async def get_user_with_all_links_by_user_id(
+        self, user_id: int
+    ) -> SUserInDBWithLinks:
         try:
             stmt = (
                 select(User)
