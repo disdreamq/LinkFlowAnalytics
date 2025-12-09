@@ -3,13 +3,35 @@ from typing import Annotated
 from fastapi import APIRouter, status
 from fastapi.params import Depends
 
-from src.modules.analytics.premium_user.schemas import SPremiumUserLinksResponse, SPremiumUserLinkStatsResponse 
+from src.modules.analytics.base_user.service import (
+    check_id,
+    get_distribution_by_week_days,
+    get_full_distribution_by_click_counter_for_user,
+    get_full_distribution_by_week_days_for_user,
+)
+from src.modules.analytics.premium_user.dependencies import required_premimum_tarifplan
+from src.modules.analytics.premium_user.schemas import (
+    SPremiumUserLinksResponse,
+    SPremiumUserLinkStatsResponse,
+)
+from src.modules.analytics.premium_user.service import (
+    get_distribution_by_browser_for_link,
+    get_full_distribution_by_browser_for_user,
+)
 from src.modules.auth.service import get_current_user
+from src.modules.link.dependencies import get_link_repository
+from src.modules.link.repository import LinkRepository
+from src.modules.user.dependencies import get_user_repository
+from src.modules.user.repository import UserRepository
 from src.modules.user.schemas import SUserInDB
 
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/analytics", tags=["users"])
+router = APIRouter(
+    prefix="/analytics/premium",
+    tags=["users"],
+    dependencies=[Depends(required_premimum_tarifplan)],
+)
 
 
 @router.get(
@@ -25,7 +47,25 @@ router = APIRouter(prefix="/analytics", tags=["users"])
 )
 async def get_full_links_analytics(
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
-): ...
+    user_repo: Annotated[UserRepository, Depends(get_user_repository)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+):
+    distr_by_click_counter = await get_full_distribution_by_click_counter_for_user(
+        current_user.id,
+        user_repo,
+    )
+    distr_by_week_days = await get_full_distribution_by_week_days_for_user(
+        current_user.id, link_repo, user_repo
+    )
+    distr_by_browser = await get_full_distribution_by_browser_for_user(
+        current_user.id, user_repo, link_repo
+    )
+    return SPremiumUserLinksResponse(
+        user_id=current_user.id,
+        full_distribution_by_click_counter=distr_by_click_counter,
+        full_distribution_by_week_days=distr_by_week_days,
+        full_distribution_by_browser=distr_by_browser,
+    )
 
 
 @router.get(
@@ -40,5 +80,18 @@ async def get_full_links_analytics(
     },
 )
 async def get_analytics_for_link(
-    link_url: str, current_user: Annotated[SUserInDB, Depends(get_current_user)]
-): ...
+    link_url: str,
+    current_user: Annotated[SUserInDB, Depends(get_current_user)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+):
+    await check_id(link_url, current_user.id, link_repo)
+    
+    distr_by_click_counter = (await link_repo.get_link_by_url(link_url)).click_counter
+    distr_by_week_days = await get_distribution_by_week_days(link_url, link_repo)
+    distr_by_browser = await get_distribution_by_browser_for_link(link_url=link_url, repo=link_repo)
+    return SPremiumUserLinkStatsResponse(
+        url=link_url,
+        click_counter=distr_by_click_counter,
+        distribution_by_week_days=distr_by_week_days,
+        distribution_by_browser=distr_by_browser
+    )
