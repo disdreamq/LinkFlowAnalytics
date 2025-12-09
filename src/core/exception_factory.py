@@ -8,6 +8,7 @@ from src.core.exceptions import (
     ValidationException,
     AuthenticationException,
     BusinessLogicException,
+    PremissonDenaiedException,
 )
 
 
@@ -67,6 +68,14 @@ class ExceptionFactory:
             exception=DataBaseException,
             message="Data base error",
             detail=f"Problems with data base while processing with {source}",
+        )
+        
+    @staticmethod
+    def premission_denaied(user_id: int):
+        return ExceptionFactory.create_exception(
+            exception=PremissonDenaiedException,
+            message='Premission denaied',
+            detail=f'No premission for user {user_id}'
         )
 
     @staticmethod

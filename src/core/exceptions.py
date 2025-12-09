@@ -79,3 +79,12 @@ class UnexpectedException(BaseAppException):
             message=message,
             detail=detail,
         )
+
+
+class PremissonDenaiedException(BaseAppException):
+    def __init__(self, message: str, detail: Optional[str] = None):
+        super().__init__(
+            status_code=status.HTTP_403_FORBIDDEN,
+            message=message,
+            detail=detail,
+        )
