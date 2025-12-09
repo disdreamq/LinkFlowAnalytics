@@ -11,7 +11,7 @@ from src.modules.auth.service import (
 )
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
-from src.modules.user.schemas import SUserInDB
+from src.modules.user.schemas import SUserInDB, SUserUpdate
 
 router = APIRouter(tags=["auth"])
 
@@ -34,3 +34,11 @@ async def read_user_me(
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
 ):
     return current_user
+
+
+@router.put("/tarifplan")
+async def change_tarifplan(
+    user_to_update: SUserUpdate, repo: Annotated[UserRepository, Depends(get_user_repository)]
+):
+    updated_user = await repo.update_user(user_to_update)
+    return updated_user

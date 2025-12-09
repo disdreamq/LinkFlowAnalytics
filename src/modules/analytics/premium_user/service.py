@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import Depends
-from src.modules.analytics.base_user.base_user_service import get_link_with_clicks_by_url
+from src.modules.analytics.base_user.service import _get_link_with_clicks_by_url
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
 from src.modules.user.dependencies import get_user_repository
@@ -10,7 +10,7 @@ from src.modules.user.repository import UserRepository
 async def get_distribution_by_browser_for_link(
     link_url: str, repo: Annotated[LinkRepository, Depends(get_link_repository)]
 ) -> dict[str, int]:
-    link = await get_link_with_clicks_by_url(link_url, repo)
+    link = await _get_link_with_clicks_by_url(link_url, repo)
     result: dict[str, int] = {}
 
     for click in link.clicks:
@@ -27,17 +27,20 @@ async def get_full_distribution_by_browser_for_user(
     link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
 ) -> dict[str, int]:
     full_browser_statistics: dict[str, int] = {}
-    links_stats = await get_list_of_distribution_by_browser_for_user(user_id, user_repo, link_repo)
-    
+    links_stats = await _get_list_of_distribution_by_browser_for_user(
+        user_id, user_repo, link_repo
+    )
+
     for stat in links_stats:
         for browser in stat.keys():
-            full_browser_statistics[browser] = full_browser_statistics.get(browser, 0) + stat[browser]
-            
+            full_browser_statistics[browser] = (
+                full_browser_statistics.get(browser, 0) + stat[browser]
+            )
+
     return full_browser_statistics
-         
-    
-     
-async def get_list_of_distribution_by_browser_for_user(
+
+
+async def _get_list_of_distribution_by_browser_for_user(
     user_id: int,
     user_repo: Annotated[UserRepository, Depends(get_user_repository)],
     link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
@@ -49,5 +52,5 @@ async def get_list_of_distribution_by_browser_for_user(
     for link in user.links:
         link_stats = await get_distribution_by_browser_for_link(link.url, link_repo)
         links_statistics.append(link_stats)
-        
+
     return links_statistics
