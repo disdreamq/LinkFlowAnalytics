@@ -1,19 +1,19 @@
-from abc import ABC, abstractmethod
 import logging
+from abc import ABC, abstractmethod
+
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 from sqlalchemy.orm import selectinload
 
+from src.core.exception_factory import exception_factory
 from src.modules.click.models import Click
-from src.modules.link.models import Link
 from src.modules.click.schemas.schemas import (
     SClickCreate,
     SClickInDB,
     SClickInDBWithLink,
 )
-from src.core.exception_factory import exception_factory
-
+from src.modules.link.models import Link
 
 logger = logging.getLogger(__name__)
 
@@ -44,15 +44,15 @@ class ClickRepository(AbstractRepository):
             logger.error(f"Integrity error while adding user: {e}")
             raise exception_factory.business_error(
                 "Bad data error",
-            )
+            ) from None
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding: {e}")
-            raise exception_factory.database_error(click)
+            raise exception_factory.database_error(click) from None
 
         except Exception as e:
             logger.critical(f"Unexpected error while adding: {e}")
-            raise exception_factory.unexpected_error({"click": click})
+            raise exception_factory.unexpected_error({"click": click}) from None
 
     async def get_click(self, click_id: int) -> SClickInDB:
         try:
@@ -62,15 +62,17 @@ class ClickRepository(AbstractRepository):
 
         except NoResultFound:
             logger.warning(f"Click with id {click_id} does not exists")
-            raise exception_factory.not_found(resource="click", identifier=click_id)
+            raise exception_factory.not_found(
+                resource="click", identifier=click_id
+            ) from None
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while adding: {e}")
-            raise exception_factory.database_error(click_id)
+            raise exception_factory.database_error(click_id) from None
 
         except Exception as e:
             logger.critical(f"Unexpected error while adding: {e}")
-            raise exception_factory.unexpected_error({"click": click_id})
+            raise exception_factory.unexpected_error({"click": click_id}) from None
 
 
 async def get_click_with_link(self, click_id: int) -> SClickInDBWithLink:
@@ -83,12 +85,14 @@ async def get_click_with_link(self, click_id: int) -> SClickInDBWithLink:
         return SClickInDBWithLink.model_validate(click)
     except NoResultFound:
         logger.warning(f"Click with id {click_id} does not exists")
-        raise exception_factory.not_found(resource="click", identifier=click_id)
+        raise exception_factory.not_found(
+            resource="click", identifier=click_id
+        ) from None
 
     except SQLAlchemyError as e:
         logger.error(f"Database error while adding: {e}")
-        raise exception_factory.database_error(click_id)
+        raise exception_factory.database_error(click_id) from None
 
     except Exception as e:
         logger.critical(f"Unexpected error while adding: {e}")
-        raise exception_factory.unexpected_error({"click": click_id})
+        raise exception_factory.unexpected_error({"click": click_id}) from None

@@ -1,14 +1,15 @@
 import logging
-from fastapi import Depends
 from typing import Annotated
+
+from fastapi import Depends
+
 from src.core.exception_factory import exception_factory
 from src.modules.click.dependencies import get_click_repository
+from src.modules.click.repository import ClickRepository
 from src.modules.click.schemas.schemas import SClickCreate
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
 from src.redis.repository import redis
-
-from src.modules.click.repository import ClickRepository
 from src.redis.service import get_increments_for_links
 
 logger = logging.getLogger(__name__)

@@ -1,23 +1,24 @@
-from typing import Any, Optional, Type
+from typing import Any
+
 from src.core.exceptions import (
     AlreadyExistsException,
+    AuthenticationException,
     BaseAppException,
+    BusinessLogicException,
     DataBaseException,
     NotFoundException,
+    PremissonDenaiedException,
     UnexpectedException,
     ValidationException,
-    AuthenticationException,
-    BusinessLogicException,
-    PremissonDenaiedException,
 )
 
 
 class ExceptionFactory:
     @staticmethod
     def create_exception(
-        exception: Type[BaseAppException],
+        exception: type[BaseAppException],
         message: str,
-        detail: Optional[str] = "",
+        detail: str | None = "",
         **kwargs: Any,
     ) -> BaseAppException:
         return exception(message=message, detail=detail, **kwargs)
@@ -55,7 +56,7 @@ class ExceptionFactory:
         )
 
     @staticmethod
-    def business_error(message: str, detail: Optional[str] = None) -> BaseAppException:
+    def business_error(message: str, detail: str | None = None) -> BaseAppException:
         return ExceptionFactory.create_exception(
             exception=BusinessLogicException,
             message=message,
@@ -69,7 +70,7 @@ class ExceptionFactory:
             message="Data base error",
             detail=f"Problems with data base while processing with {source}",
         )
-        
+
     @staticmethod
     def premission_denaied(user_id: int):
         return ExceptionFactory.create_exception(

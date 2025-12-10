@@ -1,15 +1,16 @@
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import HTTPException, status
 
 
 class BaseAppException(HTTPException):
+
     def __init__(
         self,
         status_code: int,
         message: str,
-        detail: Optional[str] = None,
-        headers: Optional[dict[str, Any]] = None,
+        detail: str | None = None,
+        headers: dict[str, Any] | None = None,
     ):
         super().__init__(
             status_code=status_code, detail=detail or message, headers=headers
@@ -18,7 +19,7 @@ class BaseAppException(HTTPException):
 
 
 class NotFoundException(BaseAppException):
-    def __init__(self, message: str, detail: Optional[str] = None):
+    def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
             message=message,
@@ -27,7 +28,7 @@ class NotFoundException(BaseAppException):
 
 
 class AlreadyExistsException(BaseAppException):
-    def __init__(self, message: str, detail: Optional[str] = None):
+    def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,
             message=message,
@@ -36,7 +37,7 @@ class AlreadyExistsException(BaseAppException):
 
 
 class ValidationException(BaseAppException):
-    def __init__(self, message: str, detail: Optional[str] = None):
+    def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             message=message,
@@ -45,7 +46,7 @@ class ValidationException(BaseAppException):
 
 
 class AuthenticationException(BaseAppException):
-    def __init__(self, message: str, detail: Optional[str] = None):
+    def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
             message=message,
@@ -55,7 +56,7 @@ class AuthenticationException(BaseAppException):
 
 
 class BusinessLogicException(BaseAppException):
-    def __init__(self, message: str, detail: Optional[str] = None):
+    def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST,
             message=message,
@@ -64,7 +65,7 @@ class BusinessLogicException(BaseAppException):
 
 
 class DataBaseException(BaseAppException):
-    def __init__(self, message: str, detail: Optional[str] = None):
+    def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=message,
@@ -73,7 +74,7 @@ class DataBaseException(BaseAppException):
 
 
 class UnexpectedException(BaseAppException):
-    def __init__(self, message: str, detail: Optional[str] = None):
+    def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=message,
@@ -82,7 +83,7 @@ class UnexpectedException(BaseAppException):
 
 
 class PremissonDenaiedException(BaseAppException):
-    def __init__(self, message: str, detail: Optional[str] = None):
+    def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,
             message=message,

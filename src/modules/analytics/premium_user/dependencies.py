@@ -1,5 +1,7 @@
 from typing import Annotated
+
 from fastapi.params import Depends
+
 from src.core.exception_factory import exception_factory
 from src.enums.enums import UserTarifPlan
 from src.modules.auth.service import get_current_user

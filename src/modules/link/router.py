@@ -1,15 +1,14 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, status
 import logging
+from typing import Annotated
 
+from fastapi import APIRouter, Depends, status
 
 from src.core.exception_factory import exception_factory
 from src.modules.auth.service import get_current_user
 from src.modules.link.dependencies import get_link_repository
-from src.modules.link.schemas.schemas import SLinkCreate, SLinkCreateInDB, SLinkResponse
 from src.modules.link.repository import LinkRepository
+from src.modules.link.schemas.schemas import SLinkCreate, SLinkCreateInDB, SLinkResponse
 from src.modules.user.schemas.schemas import SUserInDB
-
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/links", tags=["links"])

@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from src.modules.link.schemas.schemas_for_import import ImportedSLinkResponse
 from src.enums.enums import UserTarifPlan
+from src.modules.link.schemas.schemas_for_import import ImportedSLinkResponse
 
 
 class SUserCreate(BaseModel):
@@ -24,9 +25,9 @@ class SUserInDB(BaseModel):
 
 class SUserUpdate(BaseModel):
     id: int
-    email: Optional[str] = None
-    password: Optional[str] = None
-    tarifplan: Optional[UserTarifPlan] = None
+    email: str | None = None
+    password: str | None = None
+    tarifplan: UserTarifPlan | None = None
 
 
 class SUserResponse(BaseModel):

@@ -1,6 +1,6 @@
 from src.modules.analytics.base_user.schemas import (
-    SBaseUserSingleLinkResponse,
     SBaseUserAllLinksResponse,
+    SBaseUserSingleLinkResponse,
 )
 
 

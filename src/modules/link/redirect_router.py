@@ -1,16 +1,14 @@
+import logging
 from datetime import datetime
 from typing import Annotated
-from fastapi import APIRouter, Depends, status, BackgroundTasks, Request
+
+from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
 from fastapi.responses import RedirectResponse
-import logging
 
-
-from src.redis.click_buffer import get_buffer
 from src.modules.click.schemas.schemas import SClickCreate
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
-from src.redis.click_buffer import ClickBuffer
-
+from src.redis.click_buffer import ClickBuffer, get_buffer
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["redirect"])

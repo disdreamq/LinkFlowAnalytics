@@ -1,8 +1,8 @@
-from abc import ABC, abstractmethod
 import logging
-from typing import Any, Optional
-from redis import RedisError
+from abc import ABC, abstractmethod
+from typing import Any
 
+from redis import RedisError
 from src.redis.connection import RedisConnectionManager
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ class AbstractRedisRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def set(self, key: str, value: str, expire: Optional[int] = None):
+    async def set(self, key: str, value: str, expire: int | None = None):
         raise NotImplementedError
 
     @abstractmethod
@@ -34,7 +34,7 @@ class RedisRepository(AbstractRedisRepository):
     def __init__(self, connection_manager: RedisConnectionManager):
         self.connection_manager = connection_manager
 
-    async def set(self, key: str, value: Any, expire: Optional[int] = None) -> bool:
+    async def set(self, key: str, value: Any, expire: int | None = None) -> bool:
         try:
             async with self.connection_manager.get_connection() as conn:
                 return await conn.set(key, value, ex=expire)
@@ -42,7 +42,7 @@ class RedisRepository(AbstractRedisRepository):
             logger.exception(f"Redis set error: {e}")
             return False
 
-    async def get(self, key: str) -> Optional[str]:
+    async def get(self, key: str) -> str | None:
         try:
             async with self.connection_manager.get_connection() as conn:
                 return await conn.get(key)

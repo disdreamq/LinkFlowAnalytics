@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, HttpUrl
+
 from src.modules.click.schemas.schemas_for_import import ImportedSClickInDB
 from src.modules.user.schemas.schemas_for_import import ImportedSUserInDB
 

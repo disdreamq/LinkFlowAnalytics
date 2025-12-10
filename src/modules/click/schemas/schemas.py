@@ -1,12 +1,14 @@
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
+
 from src.modules.link.schemas.schemas_for_import import ImportedSLinkResponse
+
 
 class SClickCreate(BaseModel):
     link_id: int
     user_agent: str
-    user_ip: Optional[str]
+    user_ip: str | None
     created_at: datetime
 
 

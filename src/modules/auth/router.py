@@ -1,5 +1,6 @@
 from datetime import timedelta
 from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -38,7 +39,8 @@ async def read_user_me(
 
 @router.put("/tarifplan")
 async def change_tarifplan(
-    user_to_update: SUserUpdate, repo: Annotated[UserRepository, Depends(get_user_repository)]
+    user_to_update: SUserUpdate,
+    repo: Annotated[UserRepository, Depends(get_user_repository)],
 ):
     updated_user = await repo.update_user(user_to_update)
     return updated_user

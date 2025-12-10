@@ -1,5 +1,7 @@
 from typing import Annotated
+
 from fastapi import Depends
+
 from src.core.exception_factory import exception_factory
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
@@ -57,7 +59,7 @@ async def get_full_distribution_by_week_days_for_user(
     )
 
     for stat in links_stats:
-        for week_day in stat.keys():
+        for week_day in stat:
             full_week_days_statistics[week_day] = (
                 full_week_days_statistics.get(week_day, 0) + stat[week_day]
             )

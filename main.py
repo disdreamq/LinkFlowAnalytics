@@ -1,8 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
 
-from src.modules import router
 import src.db.init_models  # noqa
+from src.modules import router
 
 app = FastAPI()
 app.include_router(router)

@@ -1,5 +1,7 @@
 from typing import Annotated
+
 from fastapi import Depends
+
 from src.modules.analytics.base_user.service import _get_link_with_clicks_by_url
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
@@ -32,7 +34,7 @@ async def get_full_distribution_by_browser_for_user(
     )
 
     for stat in links_stats:
-        for browser in stat.keys():
+        for browser in stat:
             full_browser_statistics[browser] = (
                 full_browser_statistics.get(browser, 0) + stat[browser]
             )

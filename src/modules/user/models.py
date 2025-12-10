@@ -1,9 +1,11 @@
 from __future__ import annotations
-from datetime import datetime
-from sqlalchemy import String, func
-from src.db.base import Base
-from sqlalchemy.orm import mapped_column, Mapped, relationship
 
+from datetime import datetime
+
+from sqlalchemy import String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from src.db.base import Base
 from src.enums.enums import UserTarifPlan
 
 
