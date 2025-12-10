@@ -38,3 +38,6 @@ class SLinkWithClicks(SLinkResponse):
 class SLinkFull(SLinkResponse):
     user: "SUserInDB"
     clicks: list["SClickInDB"] = []
+
+SLinkWithClicks.model_rebuild()
+SLinkFull.model_rebuild()

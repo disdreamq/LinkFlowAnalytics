@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 from sqlalchemy.orm import selectinload
 
+from src.modules.link.schemas import SLinkResponse
 from src.core.exception_factory import exception_factory
 from src.core.security import get_password_hash
-from src.modules.link.models import Link
 from src.modules.user.models import User
 from src.modules.user.schemas import (
     SUserCreate,
@@ -44,7 +44,9 @@ class UserRepository(AbstractRepository):
 
     async def create_user(self, user: SUserCreate) -> SUserInDB:
         try:
-            if await self.get_user_by_email(user.email) is not None: # TODO вынести из try и отдельно сделать все нормально (посмотреть update_user)
+            if (
+                await self.get_user_by_email(user.email) is not None
+            ):  # TODO вынести из try и отдельно сделать все нормально (посмотреть update_user)
                 logger.error(
                     f"Unique email error while adding user with email {user.email}"
                 )
@@ -162,10 +164,14 @@ class UserRepository(AbstractRepository):
             stmt = (
                 select(User)
                 .where(User.id == user_id)
-                .options(selectinload(Link.clicks))
+                .options(selectinload(User.links))
             )
             result = await self.session.execute(stmt)
-            return SUserInDBWithLinks.model_validate(list(result.scalars().all()))
+            user = result.scalar()
+            if user:
+                for link in user.links:
+                    link = SLinkResponse.model_validate(link)
+            return SUserInDBWithLinks.model_validate(user)
 
         except NoResultFound:
             logger.warning(f"User with id {user_id} does not exists")
@@ -178,3 +184,4 @@ class UserRepository(AbstractRepository):
         except Exception as e:
             logger.critical(f"Unexpected error while adding: {e}")
             raise exception_factory.unexpected_error({"user_id": user_id})
+        

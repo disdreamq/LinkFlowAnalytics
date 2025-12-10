@@ -41,7 +41,7 @@ class ClickBuffer:
 
         self.counter += 1
         await self.redis.set("buffer_counter", self.counter)
-        logger.warning(f"added click {click}, {res=}")
+        logger.info(f"added click {click}")
 
         if self.counter >= 10:
             await self.write_buffer_to_bd()

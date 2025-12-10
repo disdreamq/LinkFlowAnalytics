@@ -1,6 +1,5 @@
 from typing import Annotated
 from fastapi import Depends
-from src.core import exception_factory
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
 from src.modules.link.schemas import SLinkWithClicks
@@ -79,15 +78,3 @@ async def get_full_distribution_by_click_counter_for_user(
         )
 
     return full_click_counter_statistics
-
-
-async def check_id(
-    url: str,
-    user_id: int,
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
-):
-    link = await link_repo.get_link_by_url(url)
-    if link.user_id != user_id:
-        raise exception_factory.NotFoundException(
-            f"Link with url {url} was not found for user {user_id}"
-        )

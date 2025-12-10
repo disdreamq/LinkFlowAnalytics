@@ -1,11 +1,9 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Optional
+from typing import Annotated, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from src.enums.enums import UserTarifPlan
-
-if TYPE_CHECKING:
-    from src.modules.link.schemas import SLinkResponse
+from src.modules.link.schemas import SLinkResponse
 
 
 class SUserCreate(BaseModel):
@@ -43,3 +41,6 @@ class SUserResponse(BaseModel):
 
 class SUserInDBWithLinks(SUserInDB):
     links: list["SLinkResponse"] = []
+
+
+SUserInDBWithLinks.model_rebuild()
