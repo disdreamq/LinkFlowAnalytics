@@ -9,7 +9,7 @@ from src.core.config import get_settings
 from src.modules.auth.schemas import STokenResponse, TokenData
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
-from src.modules.user.schemas import SUserInDB, SUserResponse
+from src.modules.user.schemas.schemas import SUserInDB, SUserResponse
 from src.core.exception_factory import exception_factory
 from src.core.security import password_hash
 

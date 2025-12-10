@@ -3,7 +3,7 @@ from fastapi import Depends
 from typing import Annotated
 from src.core.exception_factory import exception_factory
 from src.modules.click.dependencies import get_click_repository
-from src.modules.click.schemas import SClickCreate
+from src.modules.click.schemas.schemas import SClickCreate
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
 from src.redis.repository import redis

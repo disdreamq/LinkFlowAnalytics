@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, Callable
+from typing import Annotated
 from fastapi import APIRouter, status
 from fastapi.params import Depends
 
@@ -12,13 +12,13 @@ from src.modules.analytics.base_user.service import (
     get_full_distribution_by_click_counter_for_user,
     get_full_distribution_by_week_days_for_user,
 )
-from src.modules.analytics.base_user.dependencies import check_id
+from src.modules.analytics.base_user.service import check_id
 from src.modules.auth.service import get_current_user
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
-from src.modules.user.schemas import SUserInDB
+from src.modules.user.schemas.schemas import SUserInDB
 
 
 logger = logging.getLogger(__name__)
@@ -69,9 +69,8 @@ async def get_analytics_for_link(
     link_url: str,
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
     link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
-    id_checker: Annotated[Callable, Depends(check_id)],
 ):
-    await id_checker(link_url, current_user.id, link_repo)
+    await check_id(link_url, current_user.id, link_repo)
     click_counter = (await link_repo.get_link_by_url(link_url)).click_counter
     distr_by_week_days = await get_distribution_by_week_days(link_url, link_repo)
     return SBaseUserSingleLinkResponse(

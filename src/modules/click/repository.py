@@ -7,7 +7,11 @@ from sqlalchemy.orm import selectinload
 
 from src.modules.click.models import Click
 from src.modules.link.models import Link
-from src.modules.click.schemas import SClickCreate, SClickInDB, SClickInDBWithLink
+from src.modules.click.schemas.schemas import (
+    SClickCreate,
+    SClickInDB,
+    SClickInDBWithLink,
+)
 from src.core.exception_factory import exception_factory
 
 

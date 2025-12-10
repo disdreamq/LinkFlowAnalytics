@@ -6,7 +6,7 @@ import logging
 
 
 from src.redis.click_buffer import get_buffer
-from src.modules.click.schemas import SClickCreate
+from src.modules.click.schemas.schemas import SClickCreate
 from src.modules.link.dependencies import get_link_repository
 from src.modules.link.repository import LinkRepository
 from src.redis.click_buffer import ClickBuffer

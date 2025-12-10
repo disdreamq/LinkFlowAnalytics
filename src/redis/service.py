@@ -1,4 +1,4 @@
-from src.modules.click.schemas import SClickCreate
+from src.modules.click.schemas.schemas import SClickCreate
 
 
 def get_increments_for_links(clicks: list[SClickCreate]) -> dict[int, int]:

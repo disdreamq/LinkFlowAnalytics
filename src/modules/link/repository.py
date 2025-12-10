@@ -8,7 +8,11 @@ from sqlalchemy.orm import selectinload, joinedload
 
 from src.core.exception_factory import exception_factory
 from src.modules.link.models import Link
-from src.modules.link.schemas import SLinkCreateInDB, SLinkResponse, SLinkWithClicks
+from src.modules.link.schemas.schemas import (
+    SLinkCreateInDB,
+    SLinkResponse,
+    SLinkWithClicks,
+)
 from src.modules.link.service import url_generator
 
 logger = logging.getLogger(__name__)

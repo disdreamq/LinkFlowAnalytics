@@ -11,7 +11,7 @@ from src.modules.auth.service import (
 )
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
-from src.modules.user.schemas import SUserInDB, SUserUpdate
+from src.modules.user.schemas.schemas import SUserInDB, SUserUpdate
 
 router = APIRouter(tags=["auth"])
 

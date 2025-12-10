@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import Annotated, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
+from src.modules.link.schemas.schemas_for_import import ImportedSLinkResponse
 from src.enums.enums import UserTarifPlan
-from src.modules.link.schemas import SLinkResponse
 
 
 class SUserCreate(BaseModel):
@@ -40,7 +40,4 @@ class SUserResponse(BaseModel):
 
 
 class SUserInDBWithLinks(SUserInDB):
-    links: list["SLinkResponse"] = []
-
-
-SUserInDBWithLinks.model_rebuild()
+    links: list[ImportedSLinkResponse] = []

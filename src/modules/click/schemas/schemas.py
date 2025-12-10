@@ -1,10 +1,7 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 from pydantic import BaseModel, ConfigDict
-
-if TYPE_CHECKING:
-    from src.modules.link.schemas import SLinkResponse
-
+from src.modules.link.schemas.schemas_for_import import ImportedSLinkResponse
 
 class SClickCreate(BaseModel):
     link_id: int
@@ -20,4 +17,4 @@ class SClickInDB(SClickCreate):
 
 
 class SClickInDBWithLink(SClickInDB):
-    link: "SLinkResponse"
+    link: ImportedSLinkResponse

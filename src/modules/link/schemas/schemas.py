@@ -1,10 +1,7 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict, HttpUrl
-
-if TYPE_CHECKING:
-    from src.modules.click.schemas import SClickInDB
-    from src.modules.user.schemas import SUserInDB
+from src.modules.click.schemas.schemas_for_import import ImportedSClickInDB
+from src.modules.user.schemas.schemas_for_import import ImportedSUserInDB
 
 
 class SLinkCreate(BaseModel):
@@ -19,7 +16,6 @@ class SLinkResponse(SLinkCreateInDB):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    user_id: int
     base_url: str
     url: str
     click_counter: int
@@ -28,16 +24,13 @@ class SLinkResponse(SLinkCreateInDB):
 
 
 class SLinkWithUser(SLinkResponse):
-    user: "SUserInDB"
+    user: ImportedSUserInDB
 
 
 class SLinkWithClicks(SLinkResponse):
-    clicks: list["SClickInDB"] = []
+    clicks: list[ImportedSClickInDB] = []
 
 
 class SLinkFull(SLinkResponse):
-    user: "SUserInDB"
-    clicks: list["SClickInDB"] = []
-
-SLinkWithClicks.model_rebuild()
-SLinkFull.model_rebuild()
+    user: ImportedSUserInDB
+    clicks: list[ImportedSClickInDB] = []

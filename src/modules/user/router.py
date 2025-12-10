@@ -4,7 +4,7 @@ from fastapi.params import Depends
 import logging
 
 from src.modules.user.dependencies import get_user_repository
-from src.modules.user.schemas import SUserCreate, SUserResponse, SUserUpdate
+from src.modules.user.schemas.schemas import SUserCreate, SUserResponse, SUserUpdate
 from src.modules.user.repository import UserRepository
 
 logger = logging.getLogger(__name__)

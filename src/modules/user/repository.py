@@ -6,11 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound
 from sqlalchemy.orm import selectinload
 
-from src.modules.link.schemas import SLinkResponse
+from src.modules.link.schemas.schemas import SLinkResponse
 from src.core.exception_factory import exception_factory
 from src.core.security import get_password_hash
 from src.modules.user.models import User
-from src.modules.user.schemas import (
+from src.modules.user.schemas.schemas import (
     SUserCreate,
     SUserInDB,
     SUserInDBWithLinks,
