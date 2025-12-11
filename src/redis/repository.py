@@ -1,5 +1,4 @@
 import logging
-from abc import ABC, abstractmethod
 from typing import Any
 
 from redis import RedisError
@@ -8,33 +7,11 @@ from src.redis.connection import RedisConnectionManager
 logger = logging.getLogger(__name__)
 
 
-class AbstractRedisRepository(ABC):
-    @abstractmethod
-    async def get(self, key: str):
-        raise NotImplementedError
-
-    @abstractmethod
-    async def set(self, key: str, value: str, expire: int | None = None):
-        raise NotImplementedError
-
-    @abstractmethod
-    async def delete(self, key: str):
-        raise NotImplementedError
-
-    @abstractmethod
-    async def exists(self, key: str):
-        raise NotImplementedError
-
-    @abstractmethod
-    async def add_to_arr(self, key: str, *args: Any):
-        raise NotImplementedError
-
-
-class RedisRepository(AbstractRedisRepository):
+class RedisRepository:
     def __init__(self, connection_manager: RedisConnectionManager):
         self.connection_manager = connection_manager
 
-    async def set(self, key: str, value: Any, expire: int | None = None) -> bool:
+    async def set_(self, key: str, value: Any, expire: int | None = None) -> bool:
         try:
             async with self.connection_manager.get_connection() as conn:
                 return await conn.set(key, value, ex=expire)
