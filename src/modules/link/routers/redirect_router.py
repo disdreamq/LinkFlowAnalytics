@@ -6,9 +6,9 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
 from fastapi.responses import RedirectResponse
 
 from src.modules.click.schemas.schemas import SClickCreate
-from src.modules.link.dependencies import get_link_repository
+from src.modules.link.dependencies import get_link_service
 from src.modules.link.repository import LinkRepository
-from src.redis.click_buffer import ClickBuffer, get_buffer
+from modules.click.service.click_buffer import ClickBuffer, get_buffer
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["redirect"])
@@ -27,7 +27,7 @@ router = APIRouter(tags=["redirect"])
 )
 async def redirect(
     url: str,
-    repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    repo: Annotated[LinkRepository, Depends(get_link_service)],
     buffer: Annotated[ClickBuffer, Depends(get_buffer)],
     background_tasks: BackgroundTasks,
     request: Request,
