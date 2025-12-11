@@ -8,17 +8,13 @@ from jwt.exceptions import InvalidTokenError
 
 from src.core.config import get_settings
 from src.core.exception_factory import exception_factory
-from src.core.security import password_hash
+from src.core.security import verify_password
 from src.modules.auth.schemas import STokenResponse, TokenData
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
 from src.modules.user.schemas.schemas import SUserInDB, SUserResponse
 
 _oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-def verify_password(plain_password: str, hash_password: str) -> bool:
-    return password_hash.verify(password=plain_password, hash=hash_password)
 
 
 async def authenticate_user(
@@ -31,7 +27,7 @@ async def authenticate_user(
         plain_password=password, hash_password=user.password
     ):
         raise exception_factory.unauthorized()
-    return user
+    return SUserInDB.model_validate(user)
 
 
 def create_access_token(
