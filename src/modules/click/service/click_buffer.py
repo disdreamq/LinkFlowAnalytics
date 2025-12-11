@@ -4,10 +4,10 @@ from typing import Annotated
 from fastapi import Depends
 
 from src.core.exception_factory import exception_factory
-from src.modules.click.dependencies import get_click_repository
+from src.modules.click.dependencies import get_click_service
 from src.modules.click.repository import ClickRepository
 from src.modules.click.schemas.schemas import SClickCreate
-from src.modules.link.dependencies import get_link_repository
+from src.modules.link.dependencies import get_link_service
 from src.modules.link.repository import LinkRepository
 from src.redis.repository import redis
 from src.redis.service import get_increments_for_links
@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 class ClickBuffer:
     def __init__(
         self,
-        click_repo: Annotated[ClickRepository, Depends(get_click_repository)],
-        link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+        click_repo: Annotated[ClickRepository, Depends(get_click_service)],
+        link_repo: Annotated[LinkRepository, Depends(get_link_service)],
         max_lenght: int = 10,
     ):
         self.redis = redis
@@ -41,7 +41,7 @@ class ClickBuffer:
             )
 
         self.counter += 1
-        await self.redis.set("buffer_counter", self.counter)
+        await self.redis.set_("buffer_counter", self.counter)
         logger.info(f"added click {click}")
 
         if self.counter >= 10:
@@ -53,9 +53,9 @@ class ClickBuffer:
         clicks = [SClickCreate.model_validate_json(click) for click in data]
         clicks_in_db = await self.click_repo.create_clicks(clicks)
         clicks_dict = get_increments_for_links(clicks_in_db)
-        await self.link_repo.increment_click_counter(clicks_dict)
+        await self.link_repo.increment_click_counters(clicks_dict)
         self.counter = 0
-        await self.redis.set("buffer_counter", self.counter)
+        await self.redis.set_("buffer_counter", self.counter)
         await self.redis.delete("buffered_clicks")
 
         logger.info(f"Clicks {clicks} added to database")
@@ -67,7 +67,7 @@ class ClickBuffer:
 
 
 async def get_buffer(
-    click_repo: Annotated[ClickRepository, Depends(get_click_repository)],
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    click_repo: Annotated[ClickRepository, Depends(get_click_service)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
 ) -> ClickBuffer:
     return ClickBuffer(click_repo, link_repo)
