@@ -3,23 +3,23 @@ from typing import Annotated
 from fastapi import Depends
 
 from src.core.exception_factory import exception_factory
-from src.modules.link.dependencies import get_link_repository
+from src.modules.link.dependencies import get_link_service
 from src.modules.link.repository import LinkRepository
-from src.modules.link.schemas.schemas import SLinkWithClicks
+from src.modules.link.schemas.schemas import SLinkWithClicksResponse
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
 
 
 async def _get_link_with_clicks_by_url(
-    link_url: str, repo: Annotated[LinkRepository, Depends(get_link_repository)]
-) -> SLinkWithClicks:
+    link_url: str, repo: Annotated[LinkRepository, Depends(get_link_service)]
+) -> SLinkWithClicksResponse:
     link_id = (await repo.get_link_by_url(link_url)).id
     link_with_clicks = await repo.get_link_with_clicks(link_id)
     return link_with_clicks
 
 
 async def get_distribution_by_week_days(
-    link_url: str, repo: Annotated[LinkRepository, Depends(get_link_repository)]
+    link_url: str, repo: Annotated[LinkRepository, Depends(get_link_service)]
 ) -> dict[str, int]:
     result: dict[str, int] = {}
     link = await _get_link_with_clicks_by_url(link_url, repo)
@@ -33,7 +33,7 @@ async def get_distribution_by_week_days(
 
 async def _get_list_of_distribution_by_week_days_for_user(
     user_id: int,
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
     user_repo: Annotated[UserRepository, Depends(get_user_repository)],
 ) -> list[dict[str, int]]:
     links_statistics: list[dict[str, int]] = []
@@ -49,7 +49,7 @@ async def _get_list_of_distribution_by_week_days_for_user(
 
 async def get_full_distribution_by_week_days_for_user(
     user_id: int,
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
     user_repo: Annotated[UserRepository, Depends(get_user_repository)],
 ) -> dict[str, int]:
     full_week_days_statistics: dict[str, int] = {}
@@ -86,7 +86,7 @@ async def get_full_distribution_by_click_counter_for_user(
 async def check_id(
     url: str,
     user_id: int,
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
 ):
     link = await link_repo.get_link_by_url(url)
     if link.user_id != user_id:

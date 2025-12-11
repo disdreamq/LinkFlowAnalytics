@@ -3,14 +3,14 @@ from typing import Annotated
 from fastapi import Depends
 
 from src.modules.analytics.base_user.service import _get_link_with_clicks_by_url
-from src.modules.link.dependencies import get_link_repository
+from src.modules.link.dependencies import get_link_service
 from src.modules.link.repository import LinkRepository
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
 
 
 async def get_distribution_by_browser_for_link(
-    link_url: str, repo: Annotated[LinkRepository, Depends(get_link_repository)]
+    link_url: str, repo: Annotated[LinkRepository, Depends(get_link_service)]
 ) -> dict[str, int]:
     link = await _get_link_with_clicks_by_url(link_url, repo)
     result: dict[str, int] = {}
@@ -26,7 +26,7 @@ async def get_distribution_by_browser_for_link(
 async def get_full_distribution_by_browser_for_user(
     user_id: int,
     user_repo: Annotated[UserRepository, Depends(get_user_repository)],
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
 ) -> dict[str, int]:
     full_browser_statistics: dict[str, int] = {}
     links_stats = await _get_list_of_distribution_by_browser_for_user(
@@ -45,7 +45,7 @@ async def get_full_distribution_by_browser_for_user(
 async def _get_list_of_distribution_by_browser_for_user(
     user_id: int,
     user_repo: Annotated[UserRepository, Depends(get_user_repository)],
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
 ) -> list[dict[str, int]]:
     links_statistics: list[dict[str, int]] = []
 
