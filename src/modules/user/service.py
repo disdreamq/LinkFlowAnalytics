@@ -4,7 +4,12 @@ from typing import Literal
 from core.exception_factory import exception_factory
 from src.core.security import get_password_hash
 from src.modules.user.repository import UserRepository
-from src.modules.user.schemas.schemas import SUserCreate, SUserResponse, SUserUpdate
+from src.modules.user.schemas.schemas import (
+    SUserCreate,
+    SUserInDB,
+    SUserResponse,
+    SUserUpdate,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +30,13 @@ class UserService:
 
         return SUserResponse.model_validate(new_user)
 
-    async def get_user(self, user_id: int) -> SUserResponse:
+    async def get_user_by_id(self, user_id: int) -> SUserInDB:
         user = await self.repo.get_user_by_id(user_id)
-        return SUserResponse.model_validate(user)
+        return SUserInDB.model_validate(user)
+
+    async def get_user_by_email(self, user_email: str) -> SUserInDB:
+        user = await self.repo.get_user_by_email(user_email)
+        return SUserInDB.model_validate(user)
 
     async def update_user(self, user_to_update: SUserUpdate) -> SUserResponse:
         user_id = user_to_update.id

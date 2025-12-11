@@ -50,7 +50,7 @@ class LinkService:
             for link in links_with_incemented_click_counter
         ]
 
-    async def update_user(self, link_to_update: SLinkUpdate) -> SLinkResponse:
+    async def update_link(self, link_to_update: SLinkUpdate) -> SLinkResponse:
         link_url = link_to_update.url
         link_data = link_to_update.model_dump(
             exclude_unset=True,
@@ -59,5 +59,5 @@ class LinkService:
         updated_user = await self.repo.update_link(link_url, link_data)
         return SLinkResponse.model_validate(updated_user)
 
-    async def delete_user(self, user_id) -> Literal[True]:
+    async def delete_link(self, user_id) -> Literal[True]:
         return await self.repo.delete_link(user_id)

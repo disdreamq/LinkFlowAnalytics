@@ -10,19 +10,19 @@ from src.core.config import get_settings
 from src.core.exception_factory import exception_factory
 from src.core.security import verify_password
 from src.modules.auth.schemas import STokenResponse, TokenData
-from src.modules.user.dependencies import get_user_repository
-from src.modules.user.repository import UserRepository
+from src.modules.user.dependencies import get_user_service
 from src.modules.user.schemas.schemas import SUserInDB, SUserResponse
+from src.modules.user.service import UserService
 
 _oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def authenticate_user(
-    repo: Annotated[UserRepository, Depends(get_user_repository)],
+    service: Annotated[UserService, Depends(get_user_service)],
     email: str,
     password: str,
 ) -> SUserInDB:
-    user = await repo.get_user_by_email(email)
+    user = await service.get_user_by_email(email)
     if not user or not verify_password(
         plain_password=password, hash_password=user.password
     ):
@@ -46,7 +46,7 @@ def create_access_token(
 
 
 async def get_current_user(
-    repo: Annotated[UserRepository, Depends(get_user_repository)],
+    service: Annotated[UserService, Depends(get_user_service)],
     token: Annotated[str, Depends(_oauth2_scheme)],
 ) -> SUserResponse:
     try:
@@ -62,7 +62,7 @@ async def get_current_user(
     except InvalidTokenError:
         raise exception_factory.unauthorized() from None
 
-    user = await repo.get_user_by_email(token_data.username)
+    user = await service.get_user_by_email(token_data.username)
     if user is None:
         raise exception_factory.unauthorized()
     return SUserResponse.model_validate(user)
