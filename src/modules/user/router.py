@@ -4,9 +4,9 @@ from typing import Annotated
 from fastapi import APIRouter, status
 from fastapi.params import Depends
 
-from src.modules.user.dependencies import get_user_repository
-from src.modules.user.repository import UserRepository
+from src.modules.user.dependencies import get_user_service
 from src.modules.user.schemas.schemas import SUserCreate, SUserResponse, SUserUpdate
+from src.modules.user.service import UserService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/users", tags=["users"])
@@ -24,9 +24,9 @@ router = APIRouter(prefix="/users", tags=["users"])
     },
 )
 async def create_user(
-    user: SUserCreate, repo: Annotated[UserRepository, Depends(get_user_repository)]
+    user: SUserCreate, service: Annotated[UserService, Depends(get_user_service)]
 ):
-    user_to_create = await repo.create_user(user)
+    user_to_create = await service.create_user(user)
     return user_to_create
 
 
@@ -42,9 +42,9 @@ async def create_user(
     },
 )
 async def get_user(
-    user_id: int, repo: Annotated[UserRepository, Depends(get_user_repository)]
+    user_id: int, service: Annotated[UserService, Depends(get_user_service)]
 ):
-    user = await repo.get_user_by_id(user_id)
+    user = await service.get_user_by_id(user_id)
     return SUserResponse.model_validate(user)
 
 
@@ -62,9 +62,9 @@ async def get_user(
 )
 async def update_user(
     new_user_data: SUserUpdate,
-    repo: Annotated[UserRepository, Depends(get_user_repository)],
+    service: Annotated[UserService, Depends(get_user_service)],
 ):
-    user = await repo.update_user(new_user_data)
+    user = await service.update_user(new_user_data)
     return SUserResponse.model_validate(user)
 
 
@@ -82,9 +82,9 @@ async def update_user(
 )
 async def partically_update_user(
     new_user_data: SUserUpdate,
-    repo: Annotated[UserRepository, Depends(get_user_repository)],
+    service: Annotated[UserService, Depends(get_user_service)],
 ) -> SUserResponse:
-    user = await repo.update_user(new_user_data)
+    user = await service.update_user(new_user_data)
     return SUserResponse.model_validate(user)
 
 
@@ -100,8 +100,7 @@ async def partically_update_user(
     },
 )
 async def delete_user(
-    user_id: int,
-    repo: Annotated[UserRepository, Depends(get_user_repository)],
+    user_id: int, service: Annotated[UserService, Depends(get_user_service)]
 ):
-    await repo.delete_user(user_id)
+    await service.delete_user(user_id)
     return
