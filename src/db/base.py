@@ -3,7 +3,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 class Base(DeclarativeBase):
 
-    repr_cols = tuple()
+    repr_cols = ()
     repr_cols_num = 3
 
     def __repr__(self):
