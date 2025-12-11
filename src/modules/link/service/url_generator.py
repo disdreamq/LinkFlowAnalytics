@@ -31,7 +31,7 @@ class URLGenerator:
         if not self.ready:
             await self.initialize()
 
-        await self.redis.set("current", ",".join([str(elem) for elem in self.current]))
+        await self.redis.set_("current", ",".join([str(elem) for elem in self.current]))
         return next(self.generator())
 
     async def del_cache(self):
