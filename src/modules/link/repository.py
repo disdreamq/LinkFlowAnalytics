@@ -190,6 +190,7 @@ class LinkRepository:
             for link in links:
                 link.click_counter += links_data[link.url]
                 self.session.add(link)
+
             return links
 
         except SQLAlchemyError as e:
