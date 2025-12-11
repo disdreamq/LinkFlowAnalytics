@@ -15,7 +15,7 @@ from src.modules.analytics.base_user.service import (
     get_full_distribution_by_week_days_for_user,
 )
 from src.modules.auth.service import get_current_user
-from src.modules.link.dependencies import get_link_repository
+from src.modules.link.dependencies import get_link_service
 from src.modules.link.repository import LinkRepository
 from src.modules.user.dependencies import get_user_repository
 from src.modules.user.repository import UserRepository
@@ -38,7 +38,7 @@ router = APIRouter(prefix="/analytics", tags=["users"])
 )
 async def get_full_links_analytics(
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
     user_repo: Annotated[UserRepository, Depends(get_user_repository)],
 ):
     distr_for_click_counter = await get_full_distribution_by_click_counter_for_user(
@@ -68,7 +68,7 @@ async def get_full_links_analytics(
 async def get_analytics_for_link(
     link_url: str,
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
-    link_repo: Annotated[LinkRepository, Depends(get_link_repository)],
+    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
 ):
     await check_id(link_url, current_user.id, link_repo)
     click_counter = (await link_repo.get_link_by_url(link_url)).click_counter
