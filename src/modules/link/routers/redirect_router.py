@@ -5,10 +5,10 @@ from typing import Annotated
 from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
 from fastapi.responses import RedirectResponse
 
+from modules.click.service.click_buffer import ClickBuffer, get_buffer
+from modules.link.service.service import LinkService
 from src.modules.click.schemas.schemas import SClickCreate
 from src.modules.link.dependencies import get_link_service
-from src.modules.link.repository import LinkRepository
-from modules.click.service.click_buffer import ClickBuffer, get_buffer
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["redirect"])
@@ -27,14 +27,14 @@ router = APIRouter(tags=["redirect"])
 )
 async def redirect(
     url: str,
-    repo: Annotated[LinkRepository, Depends(get_link_service)],
+    service: Annotated[LinkService, Depends(get_link_service)],
     buffer: Annotated[ClickBuffer, Depends(get_buffer)],
     background_tasks: BackgroundTasks,
     request: Request,
 ):
     user_agent = request.headers.get("user-agent", "Unknown")
     user_ip = request.client.host if request.client else None
-    link = await repo.get_link_by_url(str(url))
+    link = await service.get_link(url)
     new_click = SClickCreate(
         link_id=link.id,
         user_agent=user_agent,

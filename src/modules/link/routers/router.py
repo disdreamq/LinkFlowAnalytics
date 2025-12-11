@@ -8,10 +8,11 @@ from src.modules.auth.service import get_current_user
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.repository import LinkRepository
 from src.modules.link.schemas.schemas import (
+    SLinkCreate,
     SLinkCreateDTO,
-    SLinkCreateInDB,
     SLinkResponse,
 )
+from src.modules.link.service.service import LinkService
 from src.modules.user.schemas.schemas import SUserInDB
 
 logger = logging.getLogger(__name__)
@@ -31,12 +32,12 @@ router = APIRouter(prefix="/links", tags=["links"])
     },
 )
 async def create_link(
-    link: SLinkCreateDTO,
-    repo: Annotated[LinkRepository, Depends(get_link_service)],
+    link: SLinkCreate,
+    service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
 ):
-    link_to_create = SLinkCreateInDB(**link.model_dump(), user_id=current_user.id)
-    new_link = await repo.create_link(link_to_create)
+    link_to_create = SLinkCreateDTO(**link.model_dump(), user_id=current_user.id)
+    new_link = await service.create_link(link_to_create)
     return new_link
 
 
@@ -54,10 +55,10 @@ async def create_link(
 )
 async def get_link_by_short_url(
     link_url: str,
-    repo: Annotated[LinkRepository, Depends(get_link_service)],
+    service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
 ):
-    link = await repo.get_link_by_url(link_url)
+    link = await service.get_link(link_url)
     if link.user_id == current_user.id:
         return link
     else:
@@ -78,12 +79,12 @@ async def get_link_by_short_url(
 )
 async def delete_link(
     link_url: str,
-    repo: Annotated[LinkRepository, Depends(get_link_service)],
+    service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
 ):
-    link = await repo.get_link_by_url(link_url)
+    link = await service.get_link(link_url)
     if link.user_id == current_user.id:
-        await repo.delete_link(link_url)
+        await service.delete_link(link_url)
         return
     else:
         raise exception_factory.not_found("link id", "{link.id}")
