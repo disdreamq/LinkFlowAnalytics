@@ -4,8 +4,8 @@ from .analytics import router as analytics_router
 from .auth.router import router as auth_router
 from .click.models import Click
 from .link.models import Link
-from .link.redirect_router import router as link_redirect_router
-from .link.router import router as link_router
+from .link.routers.redirect_router import router as link_redirect_router
+from .link.routers.router import router as link_router
 from .user.models import User
 from .user.router import router as user_router
 
