@@ -5,9 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.modules.dependencies import get_session
 from src.modules.user.repository import UserRepository
+from src.modules.user.service import UserService
 
 
-async def get_user_repository(
+async def get_user_service(
     session: Annotated[AsyncSession, Depends(get_session)],
-) -> UserRepository:
-    return UserRepository(session)
+) -> UserService:
+    return UserService(UserRepository(session))
