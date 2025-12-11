@@ -10,11 +10,11 @@ class SLinkCreate(BaseModel):
     base_url: HttpUrl
 
 
-class SLinkCreateInDB(SLinkCreate):
+class SLinkCreateDTO(SLinkCreate):
     user_id: int
 
 
-class SLinkResponse(SLinkCreateInDB):
+class SLinkResponse(SLinkCreateDTO):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -25,11 +25,17 @@ class SLinkResponse(SLinkCreateInDB):
     updated_at: datetime
 
 
+class SLinkUpdate(BaseModel):
+    url: str
+    base_url: str | None
+    user_id: int | None
+
+
 class SLinkWithUser(SLinkResponse):
     user: ImportedSUserInDB
 
 
-class SLinkWithClicks(SLinkResponse):
+class SLinkWithClicksResponse(SLinkResponse):
     clicks: list[ImportedSClickInDB] = []
 
 

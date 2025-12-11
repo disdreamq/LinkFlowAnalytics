@@ -12,11 +12,11 @@ class SClickCreate(BaseModel):
     created_at: datetime
 
 
-class SClickInDB(SClickCreate):
+class SClickResponse(SClickCreate):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
 
 
-class SClickInDBWithLink(SClickInDB):
+class SClickWithLinkResponse(SClickResponse):
     link: ImportedSLinkResponse
