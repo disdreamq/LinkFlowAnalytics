@@ -12,6 +12,7 @@ class SLinkCreate(BaseModel):
 
 class SLinkCreateDTO(SLinkCreate):
     user_id: int
+    base_url: str
 
 
 class SLinkResponse(SLinkCreateDTO):

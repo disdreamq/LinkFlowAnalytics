@@ -40,5 +40,5 @@ class SUserResponse(BaseModel):
     updated_at: datetime
 
 
-class SUserInDBWithLinks(SUserInDB):
+class SUserWithLinksDTO(SUserInDB):
     links: list[ImportedSLinkResponse] = []
