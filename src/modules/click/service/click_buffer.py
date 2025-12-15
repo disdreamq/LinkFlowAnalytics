@@ -5,12 +5,11 @@ from fastapi import Depends
 
 from src.core.exception_factory import exception_factory
 from src.modules.click.dependencies import get_click_service
-from src.modules.click.repository import ClickRepository
-from src.modules.click.schemas.schemas import SClickCreate
+from src.modules.click.schemas.schemas import SClickCreate, SClickResponse
+from src.modules.click.service.service import ClickService
 from src.modules.link.dependencies import get_link_service
-from src.modules.link.repository import LinkRepository
+from src.modules.link.service.service import LinkService
 from src.redis.repository import redis
-from src.redis.service import get_increments_for_links
 
 logger = logging.getLogger(__name__)
 
@@ -18,13 +17,13 @@ logger = logging.getLogger(__name__)
 class ClickBuffer:
     def __init__(
         self,
-        click_repo: Annotated[ClickRepository, Depends(get_click_service)],
-        link_repo: Annotated[LinkRepository, Depends(get_link_service)],
+        click_service: Annotated[ClickService, Depends(get_click_service)],
+        link_service: Annotated[LinkService, Depends(get_link_service)],
         max_lenght: int = 10,
     ):
         self.redis = redis
-        self.click_repo = click_repo
-        self.link_repo = link_repo
+        self.click_service = click_service
+        self.link_service = link_service
         self.max_lenght = max_lenght
         self.counter = 0
         self.ready = False
@@ -51,9 +50,9 @@ class ClickBuffer:
         # Добавляем клики в дб и обновляем ссылки
         data = await self.redis.get_arr("buffered_clicks")
         clicks = [SClickCreate.model_validate_json(click) for click in data]
-        clicks_in_db = await self.click_repo.create_clicks(clicks)
-        clicks_dict = get_increments_for_links(clicks_in_db)
-        await self.link_repo.increment_click_counters(clicks_dict)
+        clicks_in_db = await self.click_service.create_clicks(clicks)
+        clicks_dict = _get_increments_for_links(clicks_in_db)
+        await self.link_service.increment_click_counters(clicks_dict)
         self.counter = 0
         await self.redis.set_("buffer_counter", self.counter)
         await self.redis.delete("buffered_clicks")
@@ -66,8 +65,17 @@ class ClickBuffer:
         self.ready = True
 
 
+def _get_increments_for_links(clicks: list[SClickResponse]) -> dict[int, int]:
+    link_ids = {}
+
+    for click in clicks:
+        link_ids[click.link_id] = link_ids.get(click.link_id, 0) + 1
+
+    return link_ids
+
+
 async def get_buffer(
-    click_repo: Annotated[ClickRepository, Depends(get_click_service)],
-    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
+    click_service: Annotated[ClickService, Depends(get_click_service)],
+    link_service: Annotated[LinkService, Depends(get_link_service)],
 ) -> ClickBuffer:
-    return ClickBuffer(click_repo, link_repo)
+    return ClickBuffer(click_service, link_service)
