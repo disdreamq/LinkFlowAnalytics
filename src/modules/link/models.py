@@ -23,5 +23,7 @@ class Link(Base):
 
     user: Mapped["User"] = relationship(back_populates="links")  # noqa #type: ignore
     clicks: Mapped[list["Click"]] = relationship(  # noqa #type: ignore
-        back_populates="link"
+        back_populates="link",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
