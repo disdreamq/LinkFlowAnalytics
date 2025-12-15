@@ -165,6 +165,26 @@ class LinkRepository:
             logger.critical(f"Unexpected error while adding links: {e}")
             raise exception_factory.unexpected_error({"link_url": link_urls}) from None
 
+    async def get_multiple_links_by_ids(self, link_ids: list[int]) -> list[Link]:
+        try:
+            stmt = select(Link).filter(Link.id.in_(link_ids)).order_by(Link.id)
+            result = await self.session.execute(stmt)
+            return list(result.scalars().all())
+
+        except NoResultFound:
+            logger.warning(f"Link with id {link_ids} does not exists")
+            raise exception_factory.not_found(
+                resource="links", identifier=link_ids
+            ) from None
+
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while adding links: {e}")
+            raise exception_factory.database_error(link_ids) from None
+
+        except Exception as e:
+            logger.critical(f"Unexpected error while adding links: {e}")
+            raise exception_factory.unexpected_error({"link_ids": link_ids}) from None
+
     async def update_link(self, link_url: str, link_data: dict[str, str]) -> Link:
         link_to_update = await self.get_link_by_url(link_url)
         try:
@@ -184,13 +204,15 @@ class LinkRepository:
             logger.critical(f"Unexpected error while updating link: {e}")
             raise exception_factory.unexpected_error({"link": link_to_update}) from None
 
-    async def increment_click_counters(self, links_data: dict[str, int]) -> list[Link]:
-        links = await self.get_multiple_links_by_urls(list(links_data.keys()))
+    async def increment_click_counters(self, links_data: dict[int, int]) -> list[Link]:
+        links = await self.get_multiple_links_by_ids(list(links_data.keys()))
         try:
             for link in links:
-                link.click_counter += links_data[link.url]
+                link.click_counter += links_data[link.id]
                 self.session.add(link)
-
+                await self.session.refresh(
+                    link, attribute_names=["updated_at"]
+                )
             return links
 
         except SQLAlchemyError as e:
