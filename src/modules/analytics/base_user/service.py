@@ -4,25 +4,16 @@ from fastapi import Depends
 
 from src.core.exception_factory import exception_factory
 from src.modules.link.dependencies import get_link_service
-from src.modules.link.repository import LinkRepository
-from src.modules.link.schemas.schemas import SLinkWithClicksResponse
-from src.modules.user.dependencies import get_user_repository
-from src.modules.user.repository import UserRepository
-
-
-async def _get_link_with_clicks_by_url(
-    link_url: str, repo: Annotated[LinkRepository, Depends(get_link_service)]
-) -> SLinkWithClicksResponse:
-    link_id = (await repo.get_link_by_url(link_url)).id
-    link_with_clicks = await repo.get_link_with_clicks(link_id)
-    return link_with_clicks
+from src.modules.link.service.service import LinkService
+from src.modules.user.dependencies import get_user_service
+from src.modules.user.service import UserService
 
 
 async def get_distribution_by_week_days(
-    link_url: str, repo: Annotated[LinkRepository, Depends(get_link_service)]
+    link_url: str, service: Annotated[LinkService, Depends(get_link_service)]
 ) -> dict[str, int]:
     result: dict[str, int] = {}
-    link = await _get_link_with_clicks_by_url(link_url, repo)
+    link = await service.get_link_with_clicks(link_url)
     for click in link.clicks:
         result[f'{click.created_at.strftime("%A")}'] = (
             result.get(f'{click.created_at.strftime("%A")}', 0) + 1
@@ -33,15 +24,15 @@ async def get_distribution_by_week_days(
 
 async def _get_list_of_distribution_by_week_days_for_user(
     user_id: int,
-    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
-    user_repo: Annotated[UserRepository, Depends(get_user_repository)],
+    link_service: Annotated[LinkService, Depends(get_link_service)],
+    user_service: Annotated[UserService, Depends(get_user_service)],
 ) -> list[dict[str, int]]:
     links_statistics: list[dict[str, int]] = []
 
-    user = await user_repo.get_user_with_all_links_by_user_id(user_id)
+    user = await user_service.get_user_with_all_links(user_id)
 
     for link in user.links:
-        link_stats = await get_distribution_by_week_days(link.url, link_repo)
+        link_stats = await get_distribution_by_week_days(link.url, link_service)
         links_statistics.append(link_stats)
 
     return links_statistics
@@ -49,13 +40,13 @@ async def _get_list_of_distribution_by_week_days_for_user(
 
 async def get_full_distribution_by_week_days_for_user(
     user_id: int,
-    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
-    user_repo: Annotated[UserRepository, Depends(get_user_repository)],
+    link_service: Annotated[LinkService, Depends(get_link_service)],
+    user_service: Annotated[UserService, Depends(get_user_service)],
 ) -> dict[str, int]:
     full_week_days_statistics: dict[str, int] = {}
 
     links_stats = await _get_list_of_distribution_by_week_days_for_user(
-        user_id, link_repo, user_repo
+        user_id, link_service, user_service
     )
 
     for stat in links_stats:
@@ -69,11 +60,11 @@ async def get_full_distribution_by_week_days_for_user(
 
 async def get_full_distribution_by_click_counter_for_user(
     user_id: int,
-    user_repo: Annotated[UserRepository, Depends(get_user_repository)],
+    user_service: Annotated[UserService, Depends(get_user_service)],
 ) -> dict[str, int]:
     full_click_counter_statistics: dict[str, int] = {}
 
-    user = await user_repo.get_user_with_all_links_by_user_id(user_id)
+    user = await user_service.get_user_with_all_links(user_id)
 
     for link in user.links:
         full_click_counter_statistics[link.url] = (
@@ -86,8 +77,8 @@ async def get_full_distribution_by_click_counter_for_user(
 async def check_id(
     url: str,
     user_id: int,
-    link_repo: Annotated[LinkRepository, Depends(get_link_service)],
+    link_service: Annotated[LinkService, Depends(get_link_service)],
 ):
-    link = await link_repo.get_link_by_url(url)
+    link = await link_service.get_link(url)
     if link.user_id != user_id:
         raise exception_factory.not_found(resource="link", identifier=f"{url}")
