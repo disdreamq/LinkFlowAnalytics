@@ -1,7 +1,7 @@
 import logging
 from typing import Literal
 
-from core.exception_factory import exception_factory
+from src.core.exception_factory import exception_factory
 from src.core.security import get_password_hash
 from src.modules.user.repository import UserRepository
 from src.modules.user.schemas.schemas import (
@@ -9,6 +9,7 @@ from src.modules.user.schemas.schemas import (
     SUserInDB,
     SUserResponse,
     SUserUpdate,
+    SUserWithLinksDTO,
 )
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,10 @@ class UserService:
         user = await self.repo.get_user_by_email(user_email)
         return SUserInDB.model_validate(user)
 
+    async def get_user_with_all_links(self, user_id: int) -> SUserWithLinksDTO:
+        user = await self.repo.get_user_with_all_links_by_user_id(user_id)
+        return SUserWithLinksDTO.model_validate(user)
+
     async def update_user(self, user_to_update: SUserUpdate) -> SUserResponse:
         user_id = user_to_update.id
         user_data = user_to_update.model_dump(
@@ -50,7 +55,3 @@ class UserService:
 
     async def delete_user(self, user_id) -> Literal[True]:
         return await self.repo.delete_user(user_id)
-
-    async def get_user_with_all_links(self, user_id: int) -> SUserResponse:
-        user = await self.repo.get_user_with_all_links_by_user_id(user_id)
-        return SUserResponse.model_validate(user)
