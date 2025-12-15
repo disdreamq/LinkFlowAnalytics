@@ -26,7 +26,7 @@ router = APIRouter(tags=["redirect"])
     },
 )
 async def redirect(
-    url: str,
+    link_url: str,
     service: Annotated[LinkService, Depends(get_link_service)],
     buffer: Annotated[ClickBuffer, Depends(get_buffer)],
     background_tasks: BackgroundTasks,
@@ -34,7 +34,7 @@ async def redirect(
 ):
     user_agent = request.headers.get("user-agent", "Unknown")
     user_ip = request.client.host if request.client else None
-    link = await service.get_link(url)
+    link = await service.get_link_for_redirect(link_url=link_url)
     new_click = SClickCreate(
         link_id=link.id,
         user_agent=user_agent,
