@@ -2,7 +2,7 @@ from typing import Literal
 
 from src.modules.link.repository import LinkRepository
 from src.modules.link.schemas.schemas import (
-    SLinkCreateDTO,
+    SLinkCreate,
     SLinkResponse,
     SLinkUpdate,
     SLinkWithClicksResponse,
@@ -16,7 +16,7 @@ class LinkService:
         self.repo = repo
         self.redis = redis
 
-    async def create_link(self, link_to_create: SLinkCreateDTO) -> SLinkResponse:
+    async def create_link(self, link_to_create: SLinkCreate) -> SLinkResponse:
         short_url = await url_generator.get_url()
         new_link = await self.repo.create_link(
             **link_to_create.model_dump(), short_url=short_url
@@ -32,7 +32,7 @@ class LinkService:
         else:
             link_in_db = await self.repo.get_link_by_url(url)
             link = SLinkResponse.model_validate(link_in_db)
-            await self.redis.set_(f"link_url_{url}", link.model_dump_json())
+            await self.redis.set_(f"link_url_{url}", link.model_dump_json(), expire=10)
         return link
 
     async def get_link_with_clicks(self, link_url: str) -> SLinkWithClicksResponse:
@@ -40,7 +40,7 @@ class LinkService:
         return SLinkWithClicksResponse.model_validate(link_wtih_clicks)
 
     async def increment_click_counters(
-        self, links_data: dict[str, int]
+        self, links_data: dict[int, int]
     ) -> list[SLinkResponse]:
         links_with_incemented_click_counter = await self.repo.increment_click_counters(
             links_data
@@ -59,5 +59,5 @@ class LinkService:
         updated_user = await self.repo.update_link(link_url, link_data)
         return SLinkResponse.model_validate(updated_user)
 
-    async def delete_link(self, user_id) -> Literal[True]:
-        return await self.repo.delete_link(user_id)
+    async def delete_link(self, link_url: str) -> Literal[True]:
+        return await self.repo.delete_link(link_url)

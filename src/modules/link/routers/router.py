@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, status
 from src.core.exception_factory import exception_factory
 from src.modules.auth.service import get_current_user
 from src.modules.link.dependencies import get_link_service
-from src.modules.link.repository import LinkRepository
 from src.modules.link.schemas.schemas import (
     SLinkCreate,
     SLinkCreateDTO,
@@ -36,7 +35,9 @@ async def create_link(
     service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(get_current_user)],
 ):
-    link_to_create = SLinkCreateDTO(**link.model_dump(), user_id=current_user.id)
+    link_to_create = SLinkCreateDTO(
+        user_id=current_user.id, base_url=str(link.base_url)
+    )
     new_link = await service.create_link(link_to_create)
     return new_link
 
@@ -87,4 +88,4 @@ async def delete_link(
         await service.delete_link(link_url)
         return
     else:
-        raise exception_factory.not_found("link id", "{link.id}")
+        raise exception_factory.not_found("link url", "{link.url}")
