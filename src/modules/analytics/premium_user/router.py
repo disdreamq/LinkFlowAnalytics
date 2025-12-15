@@ -86,7 +86,9 @@ async def get_analytics_for_link(
 ):
     await check_id(link_url, current_user.id, link_service)
 
-    distr_by_click_counter = (await link_service.get_link(link_url)).click_counter
+    distr_by_click_counter = (
+        await link_service.get_link_for_redirect(link_url)
+    ).click_counter
     distr_by_week_days = await get_distribution_by_week_days(link_url, link_service)
     distr_by_browser = await get_distribution_by_browser_for_link(
         link_url=link_url, link_service=link_service
