@@ -61,11 +61,11 @@ async def get_user(
     },
 )
 async def update_user(
-    new_user_data: SUserUpdate,
+    user_to_update: SUserUpdate,
     service: Annotated[UserService, Depends(get_user_service)],
 ):
-    user = await service.update_user(new_user_data)
-    return SUserResponse.model_validate(user)
+    updated_user = await service.update_user(user_to_update)
+    return SUserResponse.model_validate(updated_user)
 
 
 @router.patch(
@@ -81,11 +81,11 @@ async def update_user(
     },
 )
 async def partically_update_user(
-    new_user_data: SUserUpdate,
+    user_to_update: SUserUpdate,
     service: Annotated[UserService, Depends(get_user_service)],
 ) -> SUserResponse:
-    user = await service.update_user(new_user_data)
-    return SUserResponse.model_validate(user)
+    updated_user = await service.update_user(user_to_update)
+    return SUserResponse.model_validate(updated_user)
 
 
 @router.delete(
@@ -103,4 +103,4 @@ async def delete_user(
     user_id: int, service: Annotated[UserService, Depends(get_user_service)]
 ):
     await service.delete_user(user_id)
-    return
+    return {'ok': True}
