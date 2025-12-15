@@ -2,7 +2,6 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from src.core.exception_factory import exception_factory
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.service.service import LinkService
 from src.modules.user.dependencies import get_user_service
@@ -10,10 +9,12 @@ from src.modules.user.service import UserService
 
 
 async def get_distribution_by_week_days(
-    link_url: str, service: Annotated[LinkService, Depends(get_link_service)]
+    user_id: int,
+    link_url: str,
+    service: Annotated[LinkService, Depends(get_link_service)],
 ) -> dict[str, int]:
     result: dict[str, int] = {}
-    link = await service.get_link_with_clicks(link_url)
+    link = await service.get_link_with_clicks(user_id=user_id, link_url=link_url)
     for click in link.clicks:
         result[f'{click.created_at.strftime("%A")}'] = (
             result.get(f'{click.created_at.strftime("%A")}', 0) + 1
@@ -32,7 +33,9 @@ async def _get_list_of_distribution_by_week_days_for_user(
     user = await user_service.get_user_with_all_links(user_id)
 
     for link in user.links:
-        link_stats = await get_distribution_by_week_days(link.url, link_service)
+        link_stats = await get_distribution_by_week_days(
+            user_id=user_id, link_url=link.url, service=link_service
+        )
         links_statistics.append(link_stats)
 
     return links_statistics
@@ -72,13 +75,3 @@ async def get_full_distribution_by_click_counter_for_user(
         )
 
     return full_click_counter_statistics
-
-
-async def check_id(
-    url: str,
-    user_id: int,
-    link_service: Annotated[LinkService, Depends(get_link_service)],
-):
-    link = await link_service.get_link(url)
-    if link.user_id != user_id:
-        raise exception_factory.not_found(resource="link", identifier=f"{url}")
