@@ -3,8 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
-from src.core.exception_factory import exception_factory
-from src.modules.auth.service import get_current_user
+from src.modules.auth.dependencies import require_auth
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.schemas.schemas import (
     SLinkCreate,
@@ -33,13 +32,13 @@ router = APIRouter(prefix="/links", tags=["links"])
 async def create_link(
     link: SLinkCreate,
     service: Annotated[LinkService, Depends(get_link_service)],
-    current_user: Annotated[SUserInDB, Depends(get_current_user)],
+    current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
     link_to_create = SLinkCreateDTO(
         user_id=current_user.id, base_url=str(link.base_url)
     )
-    new_link = await service.create_link(link_to_create)
-    return new_link
+    created_link = await service.create_link(link_to_create)
+    return created_link
 
 
 @router.get(
@@ -57,13 +56,12 @@ async def create_link(
 async def get_link_by_short_url(
     link_url: str,
     service: Annotated[LinkService, Depends(get_link_service)],
-    current_user: Annotated[SUserInDB, Depends(get_current_user)],
+    current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
-    link = await service.get_link(link_url)
-    if link.user_id == current_user.id:
-        return link
-    else:
-        raise exception_factory.not_found("link id", "{link.id}")
+    link = await service.get_link(
+        user_id=current_user.id, link_url=link_url
+    )
+    return link
 
 
 @router.delete(
@@ -81,11 +79,7 @@ async def get_link_by_short_url(
 async def delete_link(
     link_url: str,
     service: Annotated[LinkService, Depends(get_link_service)],
-    current_user: Annotated[SUserInDB, Depends(get_current_user)],
+    current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
-    link = await service.get_link(link_url)
-    if link.user_id == current_user.id:
-        await service.delete_link(link_url)
-        return
-    else:
-        raise exception_factory.not_found("link url", "{link.url}")
+    await service.delete_link(user_id=current_user.id, link_url=link_url)
+    return {"ok": True}
