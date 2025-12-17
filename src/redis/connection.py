@@ -33,7 +33,7 @@ class RedisConnectionManager:
                 raise RuntimeError("Failed to create Redis connection pool")
             yield self._pool
         except Exception as e:
-            print(f"Redis connection error: {e}")
+            logger.exception(f"Redis connection error: {e}")
             raise
 
     async def close_pool(self):

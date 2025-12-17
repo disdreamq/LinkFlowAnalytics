@@ -4,7 +4,7 @@ from typing import Literal
 from src.core.exception_factory import exception_factory
 from src.core.exceptions import NotFoundException
 from src.core.security import get_password_hash
-from src.modules.user.repository import UserRepository
+from src.modules.user.repository import SQLAlchemyUserRepository
 from src.modules.user.schemas.schemas import (
     SUserCreate,
     SUserInDB,
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class UserService:
 
-    def __init__(self, repo: UserRepository):
+    def __init__(self, repo: SQLAlchemyUserRepository):
         self.repo = repo
 
     async def create_user(self, user_to_create: SUserCreate) -> SUserResponse:
