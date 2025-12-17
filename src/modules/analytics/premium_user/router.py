@@ -90,7 +90,7 @@ async def get_analytics_for_link(
         user_id=current_user.id, link_url=link_url, service=link_service
     )
     distr_by_browser = await get_distribution_by_browser_for_link(
-        link_url=link_url, link_service=link_service
+        user_id=current_user.id, link_url=link_url, link_service=link_service
     )
     return SPremiumUserLinkStatsResponse(
         url=link_url,
