@@ -24,6 +24,7 @@ class URLGenerator:
         cached_current = await self.redis.get("current")
         if cached_current:
             self.current = [int(elem) for elem in cached_current.split(",")]
+        self.current[4] += 1
         self.generator = self._generate_url
         self.ready = True
 
