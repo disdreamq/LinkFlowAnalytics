@@ -2,6 +2,7 @@ import logging
 from typing import Literal
 
 from src.core.exception_factory import exception_factory
+from src.core.exceptions import NotFoundException
 from src.core.security import get_password_hash
 from src.modules.user.repository import UserRepository
 from src.modules.user.schemas.schemas import (
@@ -21,13 +22,15 @@ class UserService:
         self.repo = repo
 
     async def create_user(self, user_to_create: SUserCreate) -> SUserResponse:
-        if await self.repo.get_user_by_email(user_to_create.email):
+        try:
+            await self.repo.get_user_by_email(user_to_create.email)
             logger.error(
                 f"Unique email error while adding user with email {user_to_create.email}"
             )
             raise exception_factory.already_exists(user_to_create.email) from None
-        user_to_create.password = get_password_hash(user_to_create.password)
-        new_user = await self.repo.create_user(**user_to_create.model_dump())
+        except NotFoundException:
+            user_to_create.password = get_password_hash(user_to_create.password)
+            new_user = await self.repo.create_user(**user_to_create.model_dump())
 
         return SUserResponse.model_validate(new_user)
 

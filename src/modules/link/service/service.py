@@ -1,3 +1,4 @@
+import json
 from typing import Literal
 
 from src.core.exception_factory import exception_factory
@@ -28,17 +29,12 @@ class LinkService:
         self, user_id: int, link_url: str
     ) -> SLinkResponse:
         await self._verify_id(user_id, link_url)
-        if (link_in_cache := await self.redis.get(f"link_url_{link_url}")):
-            link_in_cache = await self.redis.get(f"link_url_{link_url}")
-            return SLinkResponse.model_validate(link_in_cache)
-        else:
-            link_in_db = await self.repo.get_link_by_url(link_url)
-            link = SLinkResponse.model_validate(link_in_db)
-            await self.redis.set_(
-                f"link_url_{link_url}", link.model_dump_json(), expire=10
-            )
-            return link
-
+        link_in_db = await self.repo.get_link_by_url(link_url)
+        link = SLinkResponse.model_validate(link_in_db)
+        await self.redis.set_(
+            f"link_url_{link_url}", link.model_dump_json(), expire=10
+        )
+        return link
 
     async def get_link_with_clicks(
         self, user_id: int, link_url: str
@@ -79,8 +75,7 @@ class LinkService:
         link_url: str,
     ) -> SLinkResponse:
         if (link_in_cache := await self.redis.get(f"link_url_{link_url}")):
-            link_in_cache = await self.redis.get(f"link_url_{link_url}")
-            return SLinkResponse.model_validate(link_in_cache)
+            return SLinkResponse.model_validate(json.loads(link_in_cache))
         else:
             link_in_db = await self.repo.get_link_by_url(link_url)
             link = SLinkResponse.model_validate(link_in_db)
