@@ -1,8 +1,8 @@
-"""empty message
+"""initial revision
 
-Revision ID: a4c056dd5fb3
+Revision ID: 1faa9d8e1899
 Revises:
-Create Date: 2025-11-28 16:22:34.147006
+Create Date: 2025-12-17 13:57:05.317271
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "a4c056dd5fb3"
+revision: str = "1faa9d8e1899"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,10 +28,7 @@ def upgrade() -> None:
         sa.Column("email", sa.String(), nullable=False),
         sa.Column("password", sa.String(), nullable=False),
         sa.Column(
-            "tarifplan",
-            sa.Enum("base", "premium", name="usertarifplan"),
-            server_default="base",
-            nullable=False,
+            "tarifplan", sa.String(length=50), server_default="base", nullable=False
         ),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
@@ -48,6 +45,7 @@ def upgrade() -> None:
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("base_url", sa.String(), nullable=False),
         sa.Column("url", sa.String(), nullable=False),
+        sa.Column("click_counter", sa.Integer(), nullable=False),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
@@ -63,7 +61,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("link_id", sa.Integer(), nullable=False),
         sa.Column("user_agent", sa.String(), nullable=False),
-        sa.Column("region", sa.String(), nullable=False),
+        sa.Column("user_ip", sa.String(), nullable=False),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
