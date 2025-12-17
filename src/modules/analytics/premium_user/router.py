@@ -5,12 +5,11 @@ from fastapi import APIRouter, status
 from fastapi.params import Depends
 
 from src.modules.analytics.base_user.service import (
-    check_id,
     get_distribution_by_week_days,
     get_full_distribution_by_click_counter_for_user,
     get_full_distribution_by_week_days_for_user,
 )
-from src.modules.analytics.premium_user.dependencies import required_premimum_tarifplan
+from src.modules.analytics.premium_user.dependencies import require_premimum_tarifplan
 from src.modules.analytics.premium_user.schemas import (
     SPremiumUserLinksResponse,
     SPremiumUserLinkStatsResponse,
@@ -19,7 +18,7 @@ from src.modules.analytics.premium_user.service import (
     get_distribution_by_browser_for_link,
     get_full_distribution_by_browser_for_user,
 )
-from src.modules.auth.service import get_current_user
+from src.modules.auth.dependencies import require_auth
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.service.service import LinkService
 from src.modules.user.dependencies import get_user_service
@@ -30,7 +29,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(
     prefix="/analytics/premium",
     tags=["users"],
-    dependencies=[Depends(required_premimum_tarifplan)],
+    dependencies=[Depends(require_premimum_tarifplan)],
 )
 
 
@@ -46,7 +45,7 @@ router = APIRouter(
     },
 )
 async def get_full_links_analytics(
-    current_user: Annotated[SUserInDB, Depends(get_current_user)],
+    current_user: Annotated[SUserInDB, Depends(require_auth)],
     link_service: Annotated[LinkService, Depends(get_link_service)],
     user_service: Annotated[UserService, Depends(get_user_service)],
 ):
@@ -81,15 +80,15 @@ async def get_full_links_analytics(
 )
 async def get_analytics_for_link(
     link_url: str,
-    current_user: Annotated[SUserInDB, Depends(get_current_user)],
+    current_user: Annotated[SUserInDB, Depends(require_auth)],
     link_service: Annotated[LinkService, Depends(get_link_service)],
 ):
-    await check_id(link_url, current_user.id, link_service)
-
     distr_by_click_counter = (
         await link_service.get_link_for_redirect(link_url)
     ).click_counter
-    distr_by_week_days = await get_distribution_by_week_days(link_url, link_service)
+    distr_by_week_days = await get_distribution_by_week_days(
+        user_id=current_user.id, link_url=link_url, service=link_service
+    )
     distr_by_browser = await get_distribution_by_browser_for_link(
         link_url=link_url, link_service=link_service
     )
