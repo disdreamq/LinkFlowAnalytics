@@ -2,9 +2,10 @@ import logging
 from typing import Literal
 
 from src.core.exception_factory import exception_factory
+from src.modules.user.repository import SQLAlchemyUserRepository
+
 from src.core.exceptions import NotFoundException
 from src.core.security import get_password_hash
-from src.modules.user.repository import SQLAlchemyUserRepository
 from src.modules.user.schemas.schemas import (
     SUserCreate,
     SUserInDB,
@@ -47,13 +48,11 @@ class UserService:
         return SUserWithLinksDTO.model_validate(user)
 
     async def update_user(self, user_to_update: SUserUpdate) -> SUserResponse:
-        user_id = user_to_update.id
         user_data = user_to_update.model_dump(
             exclude_unset=True,
             exclude_none=True,
         )
-        del user_data["id"]
-        updated_user = await self.repo.update_user(user_id, user_data)
+        updated_user = await self.repo.update_user(user_data)
         return SUserResponse.model_validate(updated_user)
 
     async def delete_user(self, user_id) -> Literal[True]:

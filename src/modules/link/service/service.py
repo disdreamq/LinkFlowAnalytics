@@ -2,7 +2,8 @@ import json
 from typing import Literal
 
 from src.core.exception_factory import exception_factory
-from src.modules.link.repository import LinkRepository
+
+from src.modules.link.repositories.repository import LinkRepository
 from src.modules.link.schemas.schemas import (
     SLinkCreate,
     SLinkResponse,
@@ -20,27 +21,23 @@ class LinkService:
 
     async def create_link(self, link_to_create: SLinkCreate) -> SLinkResponse:
         short_url = await url_generator.get_url()
-        new_link = await self.repo.create_link(
+        new_link = await self.repo.create(
             **link_to_create.model_dump(), short_url=short_url
         )
         return SLinkResponse.model_validate(new_link)
 
-    async def get_link(
-        self, user_id: int, link_url: str
-    ) -> SLinkResponse:
+    async def get_link(self, user_id: int, link_url: str) -> SLinkResponse:
         await self._verify_id(user_id, link_url)
-        link_in_db = await self.repo.get_link_by_url(link_url)
+        link_in_db = await self.repo.get_by_url(link_url)
         link = SLinkResponse.model_validate(link_in_db)
-        await self.redis.set_(
-            f"link_url_{link_url}", link.model_dump_json(), expire=10
-        )
+        await self.redis.set_(f"link_url_{link_url}", link.model_dump_json(), expire=10)
         return link
 
     async def get_link_with_clicks(
         self, user_id: int, link_url: str
     ) -> SLinkWithClicksResponse:
         await self._verify_id(user_id, link_url)
-        link_wtih_clicks = await self.repo.get_link_with_clicks(link_url)
+        link_wtih_clicks = await self.repo.get_with_clicks(link_url)
         return SLinkWithClicksResponse.model_validate(link_wtih_clicks)
 
     async def update_link(
@@ -52,12 +49,12 @@ class LinkService:
             exclude_unset=True,
             exclude_none=True,
         )
-        updated_user = await self.repo.update_link(link_url, link_data)
+        updated_user = await self.repo.update(link_url, link_data)
         return SLinkResponse.model_validate(updated_user)
 
     async def delete_link(self, user_id: int, link_url: str) -> Literal[True]:
         await self._verify_id(user_id, link_url)
-        return await self.repo.delete_link(link_url)
+        return await self.repo.delete(link_url)
 
     async def increment_click_counters(
         self, links_data: dict[int, int]
@@ -74,10 +71,10 @@ class LinkService:
         self,
         link_url: str,
     ) -> SLinkResponse:
-        if (link_in_cache := await self.redis.get(f"link_url_{link_url}")):
+        if link_in_cache := await self.redis.get(f"link_url_{link_url}"):
             return SLinkResponse.model_validate(json.loads(link_in_cache))
         else:
-            link_in_db = await self.repo.get_link_by_url(link_url)
+            link_in_db = await self.repo.get_by_url(link_url)
             link = SLinkResponse.model_validate(link_in_db)
             await self.redis.set_(
                 f"link_url_{link_url}", link.model_dump_json(), expire=10
@@ -85,6 +82,6 @@ class LinkService:
             return link
 
     async def _verify_id(self, current_user_id: int, link_url: str):
-        link = await self.repo.get_link_by_url(link_url)
+        link = await self.repo.get_by_url(link_url)
         if current_user_id != link.user_id:
             raise exception_factory.not_found("link id", "{link.id}")
