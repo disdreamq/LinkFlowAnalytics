@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Literal, TypeVar
+from typing import Any, Literal, TypeVar
 
 T = TypeVar("T")
 
@@ -12,17 +12,17 @@ class ICRUDRepository[T](ABC):
     """
 
     @abstractmethod
-    async def create(self, **entity_data) -> T:
+    async def create(self, *entity_data: Any) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, **entity_data) -> T:
+    async def get_by_id(self, *entity_data: Any) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, **entity_data) -> T:
+    async def update(self, *entity_data: Any) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, **entity_data) -> Literal[True]:
+    async def delete(self, *entity_data: Any) -> Literal[True]:
         raise NotImplementedError
