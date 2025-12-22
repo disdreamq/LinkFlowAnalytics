@@ -19,7 +19,3 @@ class ClickService:
     async def get_click(self, click_id: int) -> SClickResponse:
         click = await self.repo.get_by_id(click_id)
         return SClickResponse.model_validate(click)
-
-    async def get_click_with_link(self, click_id: int) -> SClickWithLinkResponse:
-        click_with_link = await self.repo.get_click_with_link(click_id)
-        return SClickWithLinkResponse.model_validate(click_with_link)
