@@ -1,10 +1,11 @@
 import json
+import logging
 from typing import Literal
 
-from src.core.exception_factory import exception_factory
-
+from core.exceptions.exceptions import PremissonDenaiedException
+from src.core.exceptions.deco_for_servicies import handle_service_exceptions
 from src.modules.link.repositories.repository import LinkRepository
-from modules.link.schemas import (
+from src.modules.link.schemas import (
     SLinkCreate,
     SLinkResponse,
     SLinkUpdate,
@@ -13,33 +14,44 @@ from modules.link.schemas import (
 from src.modules.link.service.url_generator import url_generator
 from src.redis.repository import redis
 
+logger = logging.getLogger(__name__)
+
 
 class LinkService:
     def __init__(self, repo: LinkRepository):
         self.repo = repo
         self.redis = redis
 
+    @handle_service_exceptions
     async def create_link(self, link_to_create: SLinkCreate) -> SLinkResponse:
         short_url = await url_generator.get_url()
         new_link = await self.repo.create(
             **link_to_create.model_dump(), short_url=short_url
         )
+        logger.info(f"Created link {link_to_create}")
         return SLinkResponse.model_validate(new_link)
 
+    @handle_service_exceptions
     async def get_link(self, user_id: int, link_url: str) -> SLinkResponse:
         await self._verify_id(user_id, link_url)
         link_in_db = await self.repo.get_by_url(link_url)
         link = SLinkResponse.model_validate(link_in_db)
         await self.redis.set_(f"link_url_{link_url}", link.model_dump_json(), expire=10)
+        logger.info(f"Returned link {link_url=} for user with id {user_id}")
         return link
 
+    @handle_service_exceptions
     async def get_link_with_clicks(
         self, user_id: int, link_url: str
     ) -> SLinkWithClicksResponse:
         await self._verify_id(user_id, link_url)
         link_wtih_clicks = await self.repo.get_with_clicks(link_url)
+        logger.info(
+            f"Returned link with clicks with {link_url=} for user with id {user_id}"
+        )
         return SLinkWithClicksResponse.model_validate(link_wtih_clicks)
 
+    @handle_service_exceptions
     async def update_link(
         self, user_id: int, link_to_update: SLinkUpdate
     ) -> SLinkResponse:
@@ -50,23 +62,29 @@ class LinkService:
             exclude_none=True,
         )
         updated_user = await self.repo.update(link_url, link_data)
+        logger.info(f"Updated link {link_to_update} for user with id {user_id}")
         return SLinkResponse.model_validate(updated_user)
 
+    @handle_service_exceptions
     async def delete_link(self, user_id: int, link_url: str) -> Literal[True]:
         await self._verify_id(user_id, link_url)
+        logger.info(f"Deleted link with {link_url=} for user with id {user_id}")
         return await self.repo.delete(link_url)
 
+    @handle_service_exceptions
     async def increment_click_counters(
         self, links_data: dict[int, int]
     ) -> list[SLinkResponse]:
         links_with_incemented_click_counter = await self.repo.increment_click_counters(
             links_data
         )
+        logger.info(f"Incremented click counters for links {list[links_data.keys()]}")
         return [
             SLinkResponse.model_validate(link)
             for link in links_with_incemented_click_counter
         ]
 
+    @handle_service_exceptions
     async def get_link_for_redirect(
         self,
         link_url: str,
@@ -79,9 +97,13 @@ class LinkService:
             await self.redis.set_(
                 f"link_url_{link_url}", link.model_dump_json(), expire=10
             )
+            logger.info(f"Redirected from {link_url=}")
             return link
 
+    @handle_service_exceptions
     async def _verify_id(self, current_user_id: int, link_url: str):
         link = await self.repo.get_by_url(link_url)
         if current_user_id != link.user_id:
-            raise exception_factory.not_found("link id", "{link.id}")
+            raise PremissonDenaiedException(
+                f"Can not verify {current_user_id=} with link id {link.user_id}"
+            )
