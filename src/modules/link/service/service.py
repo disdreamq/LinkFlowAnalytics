@@ -4,7 +4,7 @@ from typing import Literal
 from src.core.exception_factory import exception_factory
 
 from src.modules.link.repositories.repository import LinkRepository
-from src.modules.link.schemas.schemas import (
+from modules.link.schemas import (
     SLinkCreate,
     SLinkResponse,
     SLinkUpdate,

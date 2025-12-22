@@ -4,7 +4,7 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from src.enums.enums import UserTarifPlan
-from src.modules.link.schemas.schemas_for_import import ImportedSLinkResponse
+from src.modules.link.schemas import SLinkResponse
 
 
 class SUserCreate(BaseModel):
@@ -40,5 +40,5 @@ class SUserResponse(BaseModel):
     updated_at: datetime
 
 
-class SUserWithLinksDTO(SUserInDB):
-    links: list[ImportedSLinkResponse] = []
+class SUserWithLinks(SUserInDB):
+    links: list[SLinkResponse] = []

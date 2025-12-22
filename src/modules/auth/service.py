@@ -9,7 +9,7 @@ from src.core.exception_factory import exception_factory
 from src.core.security import verify_password
 from src.modules.auth.schemas import STokenResponse
 from src.modules.user.dependencies import get_user_service
-from src.modules.user.schemas.schemas import SUserInDB
+from modules.user.schemas import SUserInDB
 from src.modules.user.service import UserService
 
 

@@ -9,7 +9,7 @@ from src.core.config import get_settings
 from src.core.exception_factory import exception_factory
 from src.modules.auth.schemas import TokenData
 from src.modules.user.dependencies import get_user_service
-from src.modules.user.schemas.schemas import SUserInDB
+from modules.user.schemas import SUserInDB
 from src.modules.user.service import UserService
 
 _oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

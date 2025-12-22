@@ -6,12 +6,12 @@ from src.modules.user.repository import SQLAlchemyUserRepository
 
 from src.core.exceptions import NotFoundException
 from src.core.security import get_password_hash
-from src.modules.user.schemas.schemas import (
+from modules.user.schemas import (
     SUserCreate,
     SUserInDB,
     SUserResponse,
     SUserUpdate,
-    SUserWithLinksDTO,
+    SUserWithLinks,
 )
 
 logger = logging.getLogger(__name__)
@@ -43,9 +43,9 @@ class UserService:
         user = await self.repo.get_user_by_email(user_email)
         return SUserInDB.model_validate(user)
 
-    async def get_user_with_all_links(self, user_id: int) -> SUserWithLinksDTO:
+    async def get_user_with_all_links(self, user_id: int) -> SUserWithLinks:
         user = await self.repo.get_user_with_all_links_by_user_id(user_id)
-        return SUserWithLinksDTO.model_validate(user)
+        return SUserWithLinks.model_validate(user)
 
     async def update_user(self, user_to_update: SUserUpdate) -> SUserResponse:
         user_data = user_to_update.model_dump(
