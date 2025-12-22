@@ -13,11 +13,11 @@ class ClickService:
 
     async def create_clicks(self, clicks: list[SClickCreate]) -> list[SClickResponse]:
         clicks_to_create = [Click(**click.model_dump()) for click in clicks]
-        created_clicks = await self.repo.create_clicks(clicks_to_create)
+        created_clicks = await self.repo.create(clicks_to_create)
         return [SClickResponse.model_validate(click) for click in created_clicks]
 
     async def get_click(self, click_id: int) -> SClickResponse:
-        click = await self.repo.get_click(click_id)
+        click = await self.repo.get_by_id(click_id)
         return SClickResponse.model_validate(click)
 
     async def get_click_with_link(self, click_id: int) -> SClickWithLinkResponse:
