@@ -17,3 +17,7 @@ class IORMUserRepository[T](ICRUDRepository):
     @abstractmethod
     async def get_with_links(self, user_id: int) -> T:
         raise NotImplementedError
+
+    @abstractmethod
+    async def exists_by_email(self, email: str) -> bool:
+        raise NotImplementedError
