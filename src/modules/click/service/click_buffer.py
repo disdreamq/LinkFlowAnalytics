@@ -3,13 +3,13 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from src.cache.redis.repositories.repository import redis
 from src.core.exceptions.exceptions import BusinessLogicException
 from src.modules.click.dependencies import get_click_service
 from src.modules.click.schemas import SClickCreate, SClickResponse
 from src.modules.click.service.service import ClickService
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.service.service import LinkService
-from redis.repositories.repository import redis
 
 logger = logging.getLogger(__name__)
 

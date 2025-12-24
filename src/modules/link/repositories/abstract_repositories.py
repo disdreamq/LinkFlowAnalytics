@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import TypeVar
 
-from core.abstract_repositories.db_repository import ICRUDRepository
+from src.core.abstract_repositories.db_repository import ICRUDRepository
 
 T = TypeVar("T")
 

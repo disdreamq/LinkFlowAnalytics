@@ -2,8 +2,9 @@ import json
 import logging
 from typing import Literal
 
-from db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
+from src.cache.redis.repositories.repository import redis
 from src.core.exceptions.exceptions import PremissonDenaiedException
+from src.db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
 from src.modules.link.repositories.repository import LinkRepository
 from src.modules.link.schemas import (
     SLinkCreate,
@@ -12,7 +13,6 @@ from src.modules.link.schemas import (
     SLinkWithClicksResponse,
 )
 from src.modules.link.service.url_generator import url_generator
-from redis.repositories.repository import redis
 
 logger = logging.getLogger(__name__)
 

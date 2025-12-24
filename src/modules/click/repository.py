@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from abstract_repositories.db_repository import ICRUDRepository
+from src.core.abstract_repositories.db_repository import ICRUDRepository
 from src.modules.click.models import Click
 
 logger = logging.getLogger(__name__)

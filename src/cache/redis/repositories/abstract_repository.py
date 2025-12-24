@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Any
 
-from core.abstract_repositories.key_value_repository import IKeyValueRepository
+from src.core.abstract_repositories.key_value_repository import IKeyValueRepository
 
 
 class IRedisRepository(IKeyValueRepository):

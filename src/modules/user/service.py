@@ -1,9 +1,9 @@
 import logging
 from typing import Literal
 
-from db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
 from src.core.exceptions.exceptions import AlreadyExistsException
 from src.core.security import get_password_hash
+from src.db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
 from src.modules.user.repositories.abstract_repositories import IORMUserRepository
 from src.modules.user.schemas import (
     SUserCreate,
