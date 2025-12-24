@@ -1,9 +1,8 @@
 from src.modules.click.models import Click
 from src.modules.click.repository import ClickRepository
-from modules.click.schemas import (
+from src.modules.click.schemas import (
     SClickCreate,
     SClickResponse,
-    SClickWithLinkResponse,
 )
 
 
