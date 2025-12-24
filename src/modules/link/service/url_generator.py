@@ -1,6 +1,6 @@
 from string import ascii_letters, digits
 
-from src.redis.repository import redis
+from redis.repositories.repository import redis
 
 
 class URLGenerator:

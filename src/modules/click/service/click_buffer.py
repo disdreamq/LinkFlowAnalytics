@@ -9,7 +9,7 @@ from src.modules.click.schemas import SClickCreate, SClickResponse
 from src.modules.click.service.service import ClickService
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.service.service import LinkService
-from src.redis.repository import redis
+from redis.repositories.repository import redis
 
 logger = logging.getLogger(__name__)
 
