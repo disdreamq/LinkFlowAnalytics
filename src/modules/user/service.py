@@ -23,7 +23,7 @@ class UserService:
 
     @handle_service_exceptions
     async def create_user(self, user_to_create: SUserCreate) -> SUserResponse:
-        if await self.repo.exists_by_email(user_to_create.email):
+        if not await self.repo.exists_by_email(user_to_create.email):
             logger.error(
                 f"Unique email error while adding user with email {user_to_create.email}"
             )

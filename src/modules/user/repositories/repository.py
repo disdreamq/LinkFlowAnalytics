@@ -3,12 +3,12 @@ from contextlib import asynccontextmanager
 from typing import Literal
 
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from modules.user.repositories.abstract_repositories import IORMUserRepository
 from src.modules.user.models import User
+from src.modules.user.repositories.abstract_repositories import IORMUserRepository
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +41,10 @@ class SQLAlchemyUserRepository(IORMUserRepository):
             return user
 
     async def update(self, user_data: dict[str, str]) -> User:
-        async with self._handle_db_error(
-            operation="Update", user_data=user_data
-        ):
-            user = await self.get_by_id(int(user_data['id']))
+        async with self._handle_db_error(operation="Update", user_data=user_data):
+            user = await self.get_by_id(int(user_data["id"]))
             for key, value in user_data.items():
-                if hasattr(user, key) and value and key != 'id':
+                if hasattr(user, key) and value and key != "id":
                     setattr(user, key, value)
             self.session.add(user)
             await self.session.refresh(user, attribute_names=["updated_at"])
@@ -69,7 +67,10 @@ class SQLAlchemyUserRepository(IORMUserRepository):
 
     async def exists_by_email(self, email: str) -> bool:
         async with self._handle_db_error(operation="Exists by email", email=email):
-            return not await self.get_by_email(email)
+            stmt = select(User).filter(User.email == email)
+            result = await self.session.execute(stmt)
+            user = result.scalar_one_or_none()
+            return not user
 
     @asynccontextmanager
     async def _handle_db_error(self, operation: str, **context):
