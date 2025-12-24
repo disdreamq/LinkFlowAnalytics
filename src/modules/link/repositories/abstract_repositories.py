@@ -1,6 +1,9 @@
 from abc import abstractmethod
+from typing import TypeVar
 
-from src.modules.abstract_repository import ICRUDRepository
+from core.abstract_repositories.db_repository import ICRUDRepository
+
+T = TypeVar("T")
 
 
 class IORMLinkRepository[T](ICRUDRepository):
