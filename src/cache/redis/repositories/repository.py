@@ -2,12 +2,14 @@ import logging
 from typing import Any
 
 from redis import RedisError
-from src.redis.connection import RedisConnectionManager
+
+from src.cache.redis.connection import RedisConnectionManager
+from src.cache.redis.repositories.abstract_repository import IRedisRepository
 
 logger = logging.getLogger(__name__)
 
 
-class RedisRepository:
+class RedisRepository(IRedisRepository):
     def __init__(self, connection_manager: RedisConnectionManager):
         self.connection_manager = connection_manager
 
