@@ -3,9 +3,9 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from src.core.exception_factory import exception_factory
+from src.core.exceptions.exceptions import BusinessLogicException
 from src.modules.click.dependencies import get_click_service
-from modules.click.schemas import SClickCreate, SClickResponse
+from src.modules.click.schemas import SClickCreate, SClickResponse
 from src.modules.click.service.service import ClickService
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.service.service import LinkService
@@ -34,7 +34,7 @@ class ClickBuffer:
         res = await self.redis.add_to_arr("buffered_clicks", click.model_dump_json())
 
         if res == 0:
-            raise exception_factory.business_error(
+            raise BusinessLogicException(
                 message="Error while addint click to redis buffer",
                 detail=f"Can not add click {click} to redis buffer. repo returned 0",
             )

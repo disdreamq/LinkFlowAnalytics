@@ -5,11 +5,11 @@ import jwt
 from fastapi import Depends
 
 from src.core.config import get_settings
-from src.core.exception_factory import exception_factory
+from src.core.exceptions.exceptions import AuthenticationException
 from src.core.security import verify_password
 from src.modules.auth.schemas import STokenResponse
 from src.modules.user.dependencies import get_user_service
-from modules.user.schemas import SUserInDB
+from src.modules.user.schemas import SUserInDB
 from src.modules.user.service import UserService
 
 
@@ -22,7 +22,9 @@ async def authenticate_user(
     if not user or not verify_password(
         plain_password=password, hash_password=user.password
     ):
-        raise exception_factory.unauthorized()
+        raise AuthenticationException(
+            f"Can not authenticate user with {email=} and {password=}"
+        )
     return SUserInDB.model_validate(user)
 
 
