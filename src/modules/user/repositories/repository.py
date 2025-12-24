@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from typing import Literal
 
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
