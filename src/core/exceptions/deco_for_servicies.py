@@ -1,8 +1,8 @@
 import logging
 
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
 
-from core.exceptions.exceptions import (
+from src.core.exceptions.exceptions import (
     DataBaseException,
     NotFoundException,
     ValidationException,
@@ -17,8 +17,9 @@ def handle_service_exceptions(func):
         try:
             return await func(*args, **kwargs)
 
-        except NotFoundException:
-            raise
+        except NoResultFound as e:
+            logger.exception(f'No result found error: {e}')
+            raise NotFoundException('Not found exception') from e
 
         except IntegrityError as e:
             logger.exception(f"Business logic violation: {e}")
