@@ -73,19 +73,19 @@ class DataBaseException(BaseAppException):
         )
 
 
-class UnexpectedException(BaseAppException):
+class PremissonDenaiedException(BaseAppException):
     def __init__(self, message: str, detail: str | None = None):
         super().__init__(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_403_FORBIDDEN,
             message=message,
             detail=detail,
         )
 
 
-class PremissonDenaiedException(BaseAppException):
+class UnexpectedException(BaseAppException):
     def __init__(self, message: str, detail: str | None = None):
         super().__init__(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             message=message,
             detail=detail,
         )
