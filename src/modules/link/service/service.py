@@ -44,6 +44,15 @@ class LinkService:
     async def get_link_with_clicks(
         self, user_id: int, link_url: str
     ) -> SLinkWithClicksResponse:
+        """Get link with clicks due to eager load.
+
+        Args:
+            user_id (int)
+            link_url (str)
+
+        Returns:
+            SLinkWithClicksResponse: Link with clicks.
+        """
         await self._verify_id(user_id, link_url)
         link_wtih_clicks = await self.repo.get_with_clicks(link_url)
         logger.info(
@@ -75,6 +84,14 @@ class LinkService:
     async def increment_click_counters(
         self, links_data: dict[int, int]
     ) -> list[SLinkResponse]:
+        """Incremet click counters for multiple links.
+
+        Args:
+            links_data (dict[int, int]): dict with link ids and click_counter increments
+
+        Returns:
+            list[SLinkResponse]: list of links.
+        """
         links_with_incemented_click_counter = await self.repo.increment_click_counters(
             links_data
         )
@@ -89,6 +106,8 @@ class LinkService:
         self,
         link_url: str,
     ) -> SLinkResponse:
+        """Get link with cache
+        """
         if link_in_cache := await self.redis.get(f"link_url_{link_url}"):
             return SLinkResponse.model_validate(json.loads(link_in_cache))
         else:

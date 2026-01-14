@@ -11,7 +11,7 @@ from src.core.exceptions.exceptions import (
 logger = logging.getLogger(__name__)
 
 def handle_service_exceptions(func):
-    """Deco for service"""
+    """Deco for db service with exceptions handling."""
 
     async def wrapper(*args, **kwargs):
         try:

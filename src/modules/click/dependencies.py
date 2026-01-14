@@ -11,4 +11,6 @@ from src.modules.dependencies import get_session
 async def get_click_service(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> ClickService:
+    """DI for click service.
+    """
     return ClickService(ClickRepository(session))

@@ -17,6 +17,13 @@ logger = logging.getLogger(__name__)
 
 
 class UserService:
+    """User service. Doing whole business logic, handling exceptions
+    with decorator.
+    Raises:
+        NotFoundException when user not found in db
+        ValidationException when handling wrong data
+        DataBaseException when cant connect to db.
+    """
 
     def __init__(self, repo: IORMUserRepository):
         self.repo = repo
@@ -47,6 +54,14 @@ class UserService:
 
     @handle_service_exceptions
     async def get_user_with_all_links(self, user_id: int) -> SUserWithLinks:
+        """Func for get user with all links  due to eager load.
+
+        Args:
+            user_id
+
+        Returns:
+            SUserWithLinks
+        """
         user = await self.repo.get_with_links(user_id)
         logger.info(f"Service returned user with {user_id=}")
         return SUserWithLinks.model_validate(user)

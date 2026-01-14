@@ -11,4 +11,6 @@ from src.modules.user.service import UserService
 async def get_user_service(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> UserService:
+    """DI for user service.
+    """
     return UserService(SQLAlchemyUserRepository(session))

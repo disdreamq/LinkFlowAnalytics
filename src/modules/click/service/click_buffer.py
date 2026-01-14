@@ -15,6 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 class ClickBuffer:
+    """Buffer for clicks to avoid large amount of requests to db.
+    Every redirect adding this click to array in cache, when
+    lenght of array >= self.max_lenght adding all clicks from cache to db.
+    """
     def __init__(
         self,
         click_service: Annotated[ClickService, Depends(get_click_service)],

@@ -11,10 +11,10 @@ from .user.router import router as user_router
 
 router = APIRouter()
 
+router.include_router(link_redirect_router)
 router.include_router(auth_router)
 router.include_router(link_router)
 router.include_router(user_router)
-router.include_router(link_redirect_router)
 router.include_router(analytics_router)
 
 __all__ = ["User", "Link", "Click"] # noqa

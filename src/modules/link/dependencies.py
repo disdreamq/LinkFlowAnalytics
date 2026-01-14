@@ -11,4 +11,6 @@ from src.modules.link.service.service import LinkService
 async def get_link_service(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> LinkService:
+    """DI for link service.
+    """
     return LinkService(LinkRepository(session))
