@@ -2,8 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, HttpUrl
 
-from src.modules.click.schemas.schemas_for_import import ImportedSClickInDB
-from src.modules.user.schemas.schemas_for_import import ImportedSUserInDB
+from src.modules.click.schemas import SClickResponse
 
 
 class SLinkCreate(BaseModel):
@@ -32,14 +31,6 @@ class SLinkUpdate(BaseModel):
     user_id: int | None
 
 
-class SLinkWithUser(SLinkResponse):
-    user: ImportedSUserInDB
-
-
 class SLinkWithClicksResponse(SLinkResponse):
-    clicks: list[ImportedSClickInDB] = []
+    clicks: list[SClickResponse] = []
 
-
-class SLinkFull(SLinkResponse):
-    user: ImportedSUserInDB
-    clicks: list[ImportedSClickInDB] = []

@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
 from fastapi.responses import RedirectResponse
 
-from src.modules.click.schemas.schemas import SClickCreate
+from src.modules.click.schemas import SClickCreate
 from src.modules.click.service.click_buffer import ClickBuffer, get_buffer
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.service.service import LinkService

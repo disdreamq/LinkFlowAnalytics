@@ -3,18 +3,22 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from src.core.exception_factory import exception_factory
+from src.cache.redis.repositories.repository import redis
+from src.core.exceptions.exceptions import BusinessLogicException
 from src.modules.click.dependencies import get_click_service
-from src.modules.click.schemas.schemas import SClickCreate, SClickResponse
+from src.modules.click.schemas import SClickCreate, SClickResponse
 from src.modules.click.service.service import ClickService
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.service.service import LinkService
-from src.redis.repository import redis
 
 logger = logging.getLogger(__name__)
 
 
 class ClickBuffer:
+    """Buffer for clicks to avoid large amount of requests to db.
+    Every redirect adding this click to array in cache, when
+    lenght of array >= self.max_lenght adding all clicks from cache to db.
+    """
     def __init__(
         self,
         click_service: Annotated[ClickService, Depends(get_click_service)],
@@ -34,7 +38,7 @@ class ClickBuffer:
         res = await self.redis.add_to_arr("buffered_clicks", click.model_dump_json())
 
         if res == 0:
-            raise exception_factory.business_error(
+            raise BusinessLogicException(
                 message="Error while addint click to redis buffer",
                 detail=f"Can not add click {click} to redis buffer. repo returned 0",
             )

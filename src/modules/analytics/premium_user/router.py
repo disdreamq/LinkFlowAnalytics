@@ -22,7 +22,7 @@ from src.modules.auth.dependencies import require_auth
 from src.modules.link.dependencies import get_link_service
 from src.modules.link.service.service import LinkService
 from src.modules.user.dependencies import get_user_service
-from src.modules.user.schemas.schemas import SUserInDB
+from src.modules.user.schemas import SUserInDB
 from src.modules.user.service import UserService
 
 logger = logging.getLogger(__name__)

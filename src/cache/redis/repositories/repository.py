@@ -2,16 +2,18 @@ import logging
 from typing import Any
 
 from redis import RedisError
-from src.redis.connection import RedisConnectionManager
+
+from src.cache.redis.connection import RedisConnectionManager
+from src.cache.redis.repositories.abstract_repository import IRedisRepository
 
 logger = logging.getLogger(__name__)
 
 
-class RedisRepository:
+class RedisRepository(IRedisRepository):
     def __init__(self, connection_manager: RedisConnectionManager):
         self.connection_manager = connection_manager
 
-    async def set_(self, key: str, value: Any, expire: int | None = None) -> bool:
+    async def set_(self, key: str, value: Any, expire: int = 10) -> bool:
         try:
             async with self.connection_manager.get_connection() as conn:
                 return await conn.set(key, value, ex=expire)
@@ -51,7 +53,7 @@ class RedisRepository:
             logger.exception(f"Redis add error: {e}")
             return 0
 
-    async def get_arr(self, key: str) -> list:
+    async def get_arr(self, key: str) -> list[Any]:
         try:
             async with self.connection_manager.get_connection() as conn:
                 return await conn.lrange(key, 0, -1)  # type: ignore

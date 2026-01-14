@@ -5,13 +5,13 @@ from fastapi import APIRouter, Depends, status
 
 from src.modules.auth.dependencies import require_auth
 from src.modules.link.dependencies import get_link_service
-from src.modules.link.schemas.schemas import (
+from src.modules.link.schemas import (
     SLinkCreate,
     SLinkCreateDTO,
     SLinkResponse,
 )
 from src.modules.link.service.service import LinkService
-from src.modules.user.schemas.schemas import SUserInDB
+from src.modules.user.schemas import SUserInDB
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/links", tags=["links"])

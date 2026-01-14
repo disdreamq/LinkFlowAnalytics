@@ -5,7 +5,7 @@ from fastapi import APIRouter, status
 from fastapi.params import Depends
 
 from src.modules.user.dependencies import get_user_service
-from src.modules.user.schemas.schemas import SUserCreate, SUserResponse, SUserUpdate
+from src.modules.user.schemas import SUserCreate, SUserResponse, SUserUpdate
 from src.modules.user.service import UserService
 
 logger = logging.getLogger(__name__)

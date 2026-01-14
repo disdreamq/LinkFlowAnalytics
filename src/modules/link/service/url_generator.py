@@ -1,9 +1,15 @@
 from string import ascii_letters, digits
 
-from src.redis.repository import redis
+from src.cache.redis.repositories.repository import redis
 
 
 class URLGenerator:
+    """Generating short urls for links.
+    self.alphabet are responsible for char pool,
+    self.ready is False for first start, will call(async) self.initialize to get
+    current state(self.current) from cache, uses generator for generate urls.
+    """
+
     def __init__(self):
         self.redis = redis
         self.alphabet = ascii_letters + digits
