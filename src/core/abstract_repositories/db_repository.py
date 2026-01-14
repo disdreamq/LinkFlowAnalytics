@@ -5,10 +5,10 @@ T = TypeVar("T")
 
 
 class ICRUDRepository[T](ABC):
-    """
-    Abstract repository with base CRUD.
+    """Interface for db repositories with base CRUD.
 
-    raises exception if entity not found, returns entity model.
+    Raises:
+        NotImplementedError for any not implemented methods.
     """
 
     @abstractmethod

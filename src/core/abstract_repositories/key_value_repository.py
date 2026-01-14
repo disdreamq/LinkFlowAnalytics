@@ -3,10 +3,10 @@ from typing import Any
 
 
 class IKeyValueRepository(ABC):
-    """
-    Abstract repository with base CRUD.
+    """Interface for key-value storage.
 
-    raises exception if entity not found, returns entity model.
+    Raises:
+        NotImplementedError for any not implemented methods.
     """
 
     @abstractmethod

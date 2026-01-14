@@ -7,8 +7,7 @@ T = TypeVar("T")
 
 
 class IORMLinkRepository[T](ICRUDRepository):
-    """
-    Abstract ORM link repository for ORMs with eager load like SQLAlchemy.
+    """Interface for link. Use for ORMs with eager load like SQLAlchemy.
 
     Raises exception if link not found, return link model with relationship if needed.
     """
@@ -23,6 +22,17 @@ class IORMLinkRepository[T](ICRUDRepository):
 
     @abstractmethod
     async def get_multiple_links_by_urls(self, urls: list[str]) -> list[T]:
+        """Get multiple links by urls in one request.
+
+        Args:
+            urls (list[str]): link urls
+
+        Raises:
+            NotImplementedError: if method not implemented
+
+        Returns:
+            list[T]: list of links
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -31,4 +41,15 @@ class IORMLinkRepository[T](ICRUDRepository):
 
     @abstractmethod
     async def increment_click_counters(self, links_data: dict[int, int]) -> list[T]:
+        """Increment click counters for multiple links in one request.
+
+        Args:
+            links_data (dict[int, int]): dict with link id and incemetns for each link.
+
+        Raises:
+            NotImplementedError: if method not implemented
+
+        Returns:
+            list[T]: list of links.
+        """
         raise NotImplementedError
