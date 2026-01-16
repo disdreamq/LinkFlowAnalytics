@@ -26,7 +26,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 async def create_user(
     user: SUserCreate, service: Annotated[UserService, Depends(get_user_service)]
 ):
-    user_to_create = await service.create_user(user)
+    user_to_create = await service.create(user)
     return user_to_create
 
 
@@ -44,7 +44,7 @@ async def create_user(
 async def get_user(
     user_id: int, service: Annotated[UserService, Depends(get_user_service)]
 ):
-    user = await service.get_user_by_id(user_id)
+    user = await service.get_by_id(user_id)
     return SUserResponse.model_validate(user)
 
 
@@ -64,7 +64,7 @@ async def update_user(
     user_to_update: SUserUpdate,
     service: Annotated[UserService, Depends(get_user_service)],
 ):
-    updated_user = await service.update_user(user_to_update)
+    updated_user = await service.update(user_to_update)
     return SUserResponse.model_validate(updated_user)
 
 
@@ -84,7 +84,7 @@ async def partically_update_user(
     user_to_update: SUserUpdate,
     service: Annotated[UserService, Depends(get_user_service)],
 ) -> SUserResponse:
-    updated_user = await service.update_user(user_to_update)
+    updated_user = await service.update(user_to_update)
     return SUserResponse.model_validate(updated_user)
 
 
@@ -102,5 +102,5 @@ async def partically_update_user(
 async def delete_user(
     user_id: int, service: Annotated[UserService, Depends(get_user_service)]
 ):
-    await service.delete_user(user_id)
-    return {'ok': True}
+    await service.delete(user_id)
+    return {"ok": True}

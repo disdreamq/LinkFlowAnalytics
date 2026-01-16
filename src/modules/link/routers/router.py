@@ -37,7 +37,7 @@ async def create_link(
     link_to_create = SLinkCreateDTO(
         user_id=current_user.id, base_url=str(link.base_url)
     )
-    created_link = await service.create_link(link_to_create)
+    created_link = await service.create(link_to_create)
     return created_link
 
 
@@ -58,9 +58,7 @@ async def get_link_by_short_url(
     service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
-    link = await service.get_link(
-        user_id=current_user.id, link_url=link_url
-    )
+    link = await service.get_by_id(user_id=current_user.id, link_url=link_url)
     return link
 
 
@@ -81,5 +79,5 @@ async def delete_link(
     service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
-    await service.delete_link(user_id=current_user.id, link_url=link_url)
+    await service.delete(user_id=current_user.id, link_url=link_url)
     return {"ok": True}

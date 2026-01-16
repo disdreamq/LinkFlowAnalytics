@@ -34,7 +34,7 @@ async def redirect(
 ):
     user_agent = request.headers.get("user-agent", "Unknown")
     user_ip = request.client.host if request.client else None
-    link = await service.get_link_for_redirect(link_url=link_url)
+    link = await service.get_for_redirect(link_url=link_url)
     new_click = SClickCreate(
         link_id=link.id,
         user_agent=user_agent,

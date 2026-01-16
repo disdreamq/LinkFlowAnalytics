@@ -18,7 +18,7 @@ async def authenticate_user(
     email: str,
     password: str,
 ) -> SUserInDB:
-    user = await service.get_user_by_email(email)
+    user = await service.get_by_email(email)
     if not user or not verify_password(
         plain_password=password, hash_password=user.password
     ):

@@ -14,7 +14,7 @@ async def get_distribution_by_week_days(
     service: Annotated[LinkService, Depends(get_link_service)],
 ) -> dict[str, int]:
     result: dict[str, int] = {}
-    link = await service.get_link_with_clicks(user_id=user_id, link_url=link_url)
+    link = await service.get_with_clicks(user_id=user_id, link_url=link_url)
     for click in link.clicks:
         result[f'{click.created_at.strftime("%A")}'] = (
             result.get(f'{click.created_at.strftime("%A")}', 0) + 1
@@ -30,7 +30,7 @@ async def _get_list_of_distribution_by_week_days_for_user(
 ) -> list[dict[str, int]]:
     links_statistics: list[dict[str, int]] = []
 
-    user = await user_service.get_user_with_all_links(user_id)
+    user = await user_service.get_with_all_links(user_id)
 
     for link in user.links:
         link_stats = await get_distribution_by_week_days(
@@ -67,7 +67,7 @@ async def get_full_distribution_by_click_counter_for_user(
 ) -> dict[str, int]:
     full_click_counter_statistics: dict[str, int] = {}
 
-    user = await user_service.get_user_with_all_links(user_id)
+    user = await user_service.get_with_all_links(user_id)
 
     for link in user.links:
         full_click_counter_statistics[link.url] = (

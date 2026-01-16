@@ -29,7 +29,7 @@ class UserService:
         self.repo = repo
 
     @handle_service_exceptions
-    async def create_user(self, user_to_create: SUserCreate) -> SUserResponse:
+    async def create(self, user_to_create: SUserCreate) -> SUserResponse:
         if not await self.repo.exists_by_email(user_to_create.email):
             logger.error(
                 f"Unique email error while adding user with email {user_to_create.email}"
@@ -41,19 +41,19 @@ class UserService:
         return SUserResponse.model_validate(new_user)
 
     @handle_service_exceptions
-    async def get_user_by_id(self, user_id: int) -> SUserInDB:
+    async def get_by_id(self, user_id: int) -> SUserInDB:
         user = await self.repo.get_by_id(user_id)
         logger.info(f"Service returned user with {user_id=}")
         return SUserInDB.model_validate(user)
 
     @handle_service_exceptions
-    async def get_user_by_email(self, email: str) -> SUserInDB:
+    async def get_by_email(self, email: str) -> SUserInDB:
         user = await self.repo.get_by_email(email)
         logger.info(f"Service returned user with {email=}")
         return SUserInDB.model_validate(user)
 
     @handle_service_exceptions
-    async def get_user_with_all_links(self, user_id: int) -> SUserWithLinks:
+    async def get_with_all_links(self, user_id: int) -> SUserWithLinks:
         """Func for get user with all links  due to eager load.
 
         Args:
@@ -67,7 +67,7 @@ class UserService:
         return SUserWithLinks.model_validate(user)
 
     @handle_service_exceptions
-    async def update_user(self, user_to_update: SUserUpdate) -> SUserResponse:
+    async def update(self, user_to_update: SUserUpdate) -> SUserResponse:
         user_data = user_to_update.model_dump(
             exclude_unset=True,
             exclude_none=True,
@@ -77,6 +77,6 @@ class UserService:
         return SUserResponse.model_validate(updated_user)
 
     @handle_service_exceptions
-    async def delete_user(self, user_id) -> Literal[True]:
+    async def delete(self, user_id) -> Literal[True]:
         logger.info(f"Service deleted user with {user_id=}")
         return await self.repo.delete(user_id)

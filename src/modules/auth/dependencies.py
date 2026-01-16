@@ -32,7 +32,7 @@ async def require_auth(
     except InvalidTokenError:
         raise AuthenticationException("Auth error") from None
 
-    user = await service.get_user_by_email(token_data.username)
+    user = await service.get_by_email(token_data.username)
     if user is None:
         raise AuthenticationException("Auth error") from None
     return SUserInDB.model_validate(user)
