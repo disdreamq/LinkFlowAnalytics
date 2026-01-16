@@ -12,17 +12,17 @@ class ICRUDRepository[T](ABC):
     """
 
     @abstractmethod
-    async def create(self, *entity_data: Any) -> T:
+    async def create(self, *args, **kwargs) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, *entity_data: Any) -> T:
+    async def get_by_id(self, *args, **kwargs) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, *entity_data: Any) -> T:
+    async def update(self, *args, **kwargs) -> T:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, *entity_data: Any) -> Literal[True]:
+    async def delete(self, *args, **kwargs) -> Literal[True]:
         raise NotImplementedError
