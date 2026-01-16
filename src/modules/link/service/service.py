@@ -2,12 +2,14 @@ import json
 import logging
 from typing import Literal
 
+from modules.link.repositories.abstract_repositories import IORMLinkRepository
 from src.cache.redis.repositories.repository import redis
 from src.core.exceptions.exceptions import PremissonDenaiedException
 from src.db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
 from src.modules.link.repositories.repository import LinkRepository
 from src.modules.link.schemas import (
     SLinkCreate,
+    SLinkCreateDTO,
     SLinkResponse,
     SLinkUpdate,
     SLinkWithClicksResponse,
@@ -18,12 +20,13 @@ logger = logging.getLogger(__name__)
 
 
 class LinkService:
-    def __init__(self, repo: LinkRepository):
+
+    def __init__(self, repo: IORMLinkRepository):
         self.repo = repo
         self.redis = redis
 
     @handle_service_exceptions
-    async def create_link(self, link_to_create: SLinkCreate) -> SLinkResponse:
+    async def create(self, link_to_create: SLinkCreateDTO) -> SLinkResponse:
         short_url = await url_generator.get_url()
         new_link = await self.repo.create(
             **link_to_create.model_dump(), short_url=short_url
@@ -32,7 +35,7 @@ class LinkService:
         return SLinkResponse.model_validate(new_link)
 
     @handle_service_exceptions
-    async def get_link(self, user_id: int, link_url: str) -> SLinkResponse:
+    async def get_by_id(self, user_id: int, link_url: str) -> SLinkResponse:
         await self._verify_id(user_id, link_url)
         link_in_db = await self.repo.get_by_url(link_url)
         link = SLinkResponse.model_validate(link_in_db)
@@ -41,7 +44,7 @@ class LinkService:
         return link
 
     @handle_service_exceptions
-    async def get_link_with_clicks(
+    async def get_with_clicks(
         self, user_id: int, link_url: str
     ) -> SLinkWithClicksResponse:
         """Get link with clicks due to eager load.
@@ -61,9 +64,7 @@ class LinkService:
         return SLinkWithClicksResponse.model_validate(link_wtih_clicks)
 
     @handle_service_exceptions
-    async def update_link(
-        self, user_id: int, link_to_update: SLinkUpdate
-    ) -> SLinkResponse:
+    async def update(self, user_id: int, link_to_update: SLinkUpdate) -> SLinkResponse:
         await self._verify_id(user_id, link_to_update.url)
         link_url = link_to_update.url
         link_data = link_to_update.model_dump(
@@ -75,7 +76,7 @@ class LinkService:
         return SLinkResponse.model_validate(updated_user)
 
     @handle_service_exceptions
-    async def delete_link(self, user_id: int, link_url: str) -> Literal[True]:
+    async def delete(self, user_id: int, link_url: str) -> Literal[True]:
         await self._verify_id(user_id, link_url)
         logger.info(f"Deleted link with {link_url=} for user with id {user_id}")
         return await self.repo.delete(link_url)
@@ -102,12 +103,11 @@ class LinkService:
         ]
 
     @handle_service_exceptions
-    async def get_link_for_redirect(
+    async def get_for_redirect(
         self,
         link_url: str,
     ) -> SLinkResponse:
-        """Get link with cache
-        """
+        """Get link with cache"""
         if link_in_cache := await self.redis.get(f"link_url_{link_url}"):
             return SLinkResponse.model_validate(json.loads(link_in_cache))
         else:

@@ -1,5 +1,5 @@
+from src.core.abstract_repositories.db_repository import ICRUDRepository
 from src.modules.click.models import Click
-from src.modules.click.repository import ClickRepository
 from src.modules.click.schemas import (
     SClickCreate,
     SClickResponse,
@@ -7,7 +7,8 @@ from src.modules.click.schemas import (
 
 
 class ClickService:
-    def __init__(self, repo: ClickRepository):
+
+    def __init__(self, repo: ICRUDRepository):
         self.repo = repo
 
     async def create_clicks(self, clicks: list[SClickCreate]) -> list[SClickResponse]:
