@@ -5,6 +5,7 @@ from src.core.abstract_repositories.db_repository import ICRUDRepository
 
 T = TypeVar("T")
 
+
 class IORMUserRepository[T](ICRUDRepository):
     """Intrface for user. Use for ORMs with eager load like SQLAlchemy.
 

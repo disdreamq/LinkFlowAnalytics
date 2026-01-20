@@ -1,13 +1,14 @@
+import datetime
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from enums.enums import UserTarifPlan
+from src.enums.enums import UserTarifPlan
 from src.modules.user.schemas import SUserCreate, SUserUpdate
 from src.modules.user.service import UserService
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def mock_user_repo():
     repo = MagicMock()
 
@@ -15,7 +16,7 @@ def mock_user_repo():
     repo.create = AsyncMock()
     repo.get_by_id = AsyncMock()
     repo.get_by_email = AsyncMock()
-    repo.get_with_links = AsyncMock()
+    repo.get_with_all_links = AsyncMock()
     repo.update = AsyncMock()
     repo.delete = AsyncMock()
 
@@ -23,8 +24,8 @@ def mock_user_repo():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def user_service(mock_repo):
-    return UserService(repo=mock_repo)
+def user_service(mock_user_repo):
+    return UserService(repo=mock_user_repo)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -34,28 +35,26 @@ def sample_user_data():
         "email": "test@example.com",
         "password": "plain_password",
         "tarifplan": UserTarifPlan.Base,
+        "created_at": datetime.datetime.now(),
+        "updated_at": datetime.datetime.now(),
     }
 
 
 @pytest.fixture(scope="session", autouse=True)
-def sample_user_create():
-    data = sample_user_data()
+def sample_user_create(sample_user_data):
     return SUserCreate(
-        email=data["email"],
-        password=data["password"],
+        email=sample_user_data["email"],
+        password=sample_user_data["password"],
     )
 
 
 @pytest.fixture(scope="session", autouse=True)
 def sample_user_update(
-    new_email: str | None = None,
-    new_password: str | None = None,
-    new_tarifplan: UserTarifPlan | None = None,
+    sample_user_data,
 ):
-    data = sample_user_data()
     return SUserUpdate(
-        id=data["id"],
-        email=new_email,
-        password=new_password,
-        tarifplan=new_tarifplan,
+        id=sample_user_data["id"],
+        email="new_email@example.com",
+        password="new_password",
+        tarifplan=UserTarifPlan.Premium,
     )
