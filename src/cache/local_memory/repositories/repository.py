@@ -68,3 +68,5 @@ class LocalMemoryRepository(ILocalMemoryRepository):
                 del self._storage[key]
 
         self._last_cleanup = datetime.now()
+
+in_memory_cache = LocalMemoryRepository()

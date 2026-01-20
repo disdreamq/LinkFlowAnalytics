@@ -58,7 +58,7 @@ async def get_link_by_short_url(
     service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
-    link = await service.get_by_id(user_id=current_user.id, link_url=link_url)
+    link = await service.get_by_url(user_id=current_user.id, link_url=link_url)
     return link
 
 

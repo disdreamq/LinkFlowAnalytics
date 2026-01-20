@@ -39,7 +39,7 @@ class AlreadyExistsException(BaseAppException):
 class ValidationException(BaseAppException):
     def __init__(self, message: str, detail: str | None = None):
         super().__init__(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             message=message,
             detail=detail,
         )

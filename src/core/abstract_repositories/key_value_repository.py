@@ -10,17 +10,17 @@ class IKeyValueRepository(ABC):
     """
 
     @abstractmethod
-    async def set_(self, *entity_data: Any) -> bool:
+    async def set_(self, *args, **kwargs) -> bool:
         raise NotImplementedError from None
 
     @abstractmethod
-    async def get(self, *entity_data: Any) -> str | None:
+    async def get(self, *args, **kwargs) -> str | None:
         raise NotImplementedError from None
 
     @abstractmethod
-    async def delete(self, *entity_data: Any) -> int:
+    async def delete(self, *args, **kwargs) -> int:
         raise NotImplementedError from None
 
     @abstractmethod
-    async def exists(self, *entity_data: Any) -> bool:
+    async def exists(self, *args, **kwargs) -> bool:
         raise NotImplementedError from None

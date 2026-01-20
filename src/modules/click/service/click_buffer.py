@@ -51,7 +51,8 @@ class ClickBuffer:
             await self.write_buffer_to_bd()
 
     async def write_buffer_to_bd(self):
-        # Добавляем клики в дб и обновляем ссылки
+        """Adding clicks to db and increment click counters for links
+        """
         data = await self.redis.get_arr("buffered_clicks")
         clicks = [SClickCreate.model_validate_json(click) for click in data]
         clicks_in_db = await self.click_service.create_clicks(clicks)
