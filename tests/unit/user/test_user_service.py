@@ -135,14 +135,14 @@ class TestUserServiceGetByEmail:
             await user_service.get_by_id(52)
 
 
-class TestUserServiceGetWithAllLinks:
-    """Tests for get_with_all_links"""
+class TestUserServiceGetWithLinks:
+    """Tests for get_with_links"""
 
     @pytest.mark.asyncio
-    async def test_get_with_all_links_success(
+    async def test_get_with_links_success(
         self, mock_user_repo, user_service, sample_user_data
     ):
-        """Test for get_with_all_links success"""
+        """Test for get_with_links success"""
         user_with_links = {
             **sample_user_data,
             "links": [
@@ -166,9 +166,9 @@ class TestUserServiceGetWithAllLinks:
                 ),
             ],
         }
-        mock_user_repo.get_with_all_links.return_value = user_with_links
+        mock_user_repo.get_with_links.return_value = user_with_links
 
-        result = await user_service.get_with_all_links(user_with_links["id"])
+        result = await user_service.get_with_links(user_with_links["id"])
 
         assert isinstance(result, SUserWithLinks)
         assert isinstance(result.links[0], SLinkResponse)
@@ -185,12 +185,12 @@ class TestUserServiceGetWithAllLinks:
         ],
     )
     @pytest.mark.asyncio
-    async def test_get_with_all_links_fail(
+    async def test_get_with_links_fail(
         self, mock_user_repo, user_service, Db_exception, buisuness_exception
     ):
-        mock_user_repo.get_with_all_links.side_effect = Db_exception("1", "2", "3")
+        mock_user_repo.get_with_links.side_effect = Db_exception("1", "2", "3")
         with pytest.raises(buisuness_exception):
-            await user_service.get_with_all_links(52)
+            await user_service.get_with_links(52)
 
 
 class TestUserServiceUpdate:

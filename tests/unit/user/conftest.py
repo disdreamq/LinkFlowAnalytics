@@ -16,7 +16,7 @@ def mock_user_repo():
     repo.create = AsyncMock()
     repo.get_by_id = AsyncMock()
     repo.get_by_email = AsyncMock()
-    repo.get_with_all_links = AsyncMock()
+    repo.get_with_links = AsyncMock()
     repo.update = AsyncMock()
     repo.delete = AsyncMock()
 

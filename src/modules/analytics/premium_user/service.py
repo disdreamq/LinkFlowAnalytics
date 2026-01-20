@@ -50,7 +50,7 @@ async def _get_list_of_distribution_by_browser_for_user(
 ) -> list[dict[str, int]]:
     links_statistics: list[dict[str, int]] = []
 
-    user = await user_service.get_with_all_links(user_id)
+    user = await user_service.get_with_links(user_id)
 
     for link in user.links:
         link_stats = await get_distribution_by_browser_for_link(

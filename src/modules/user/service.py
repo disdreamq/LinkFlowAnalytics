@@ -53,7 +53,7 @@ class UserService:
         return SUserInDB.model_validate(user)
 
     @handle_service_exceptions
-    async def get_with_all_links(self, user_id: int) -> SUserWithLinks:
+    async def get_with_links(self, user_id: int) -> SUserWithLinks:
         """Func for get user with all links  due to eager load.
 
         Args:

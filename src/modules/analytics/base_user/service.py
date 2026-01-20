@@ -30,7 +30,7 @@ async def _get_list_of_distribution_by_week_days_for_user(
 ) -> list[dict[str, int]]:
     links_statistics: list[dict[str, int]] = []
 
-    user = await user_service.get_with_all_links(user_id)
+    user = await user_service.get_with_links(user_id)
 
     for link in user.links:
         link_stats = await get_distribution_by_week_days(
@@ -67,7 +67,7 @@ async def get_full_distribution_by_click_counter_for_user(
 ) -> dict[str, int]:
     full_click_counter_statistics: dict[str, int] = {}
 
-    user = await user_service.get_with_all_links(user_id)
+    user = await user_service.get_with_links(user_id)
 
     for link in user.links:
         full_click_counter_statistics[link.url] = (

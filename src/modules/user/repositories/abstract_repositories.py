@@ -27,7 +27,7 @@ class IORMUserRepository[T](ICRUDRepository):
             NotImplementedError if method not implemented.
 
         Returns:
-            User entity.
+            User with links
         """
         raise NotImplementedError
 
