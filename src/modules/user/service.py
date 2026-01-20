@@ -62,7 +62,7 @@ class UserService:
         Returns:
             SUserWithLinks
         """
-        user = await self.repo.get_with_all_links(user_id)
+        user = await self.repo.get_with_links(user_id)
         logger.info(f"Service returned user with {user_id=}")
         return SUserWithLinks.model_validate(user)
 
