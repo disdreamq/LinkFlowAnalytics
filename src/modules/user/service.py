@@ -30,7 +30,7 @@ class UserService:
 
     @handle_service_exceptions
     async def create(self, user_to_create: SUserCreate) -> SUserResponse:
-        if not await self.repo.exists_by_email(user_to_create.email):
+        if await self.repo.exists_by_email(user_to_create.email):
             logger.error(
                 f"Unique email error while adding user with email {user_to_create.email}"
             )
@@ -62,7 +62,7 @@ class UserService:
         Returns:
             SUserWithLinks
         """
-        user = await self.repo.get_with_links(user_id)
+        user = await self.repo.get_with_all_links(user_id)
         logger.info(f"Service returned user with {user_id=}")
         return SUserWithLinks.model_validate(user)
 
