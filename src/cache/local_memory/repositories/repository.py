@@ -29,10 +29,8 @@ class LocalMemoryRepository(ILocalMemoryRepository):
 
     async def delete(self, key: str) -> int:
         async with self._lock:
-            if await self.exists(key):
-                del self._storage[key]
-                return 1
-        return 0
+            res = self._storage.pop(key, None)
+        return 1 if res else 0
 
     async def exists(self, key: str) -> bool:
         async with self._lock:
