@@ -17,4 +17,4 @@ router.include_router(link_router)
 router.include_router(user_router)
 router.include_router(analytics_router)
 
-__all__ = ["User", "Link", "Click"] # noqa
+__all__ = ["User", "Link", "Click"]
