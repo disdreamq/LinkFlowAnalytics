@@ -1,4 +1,5 @@
 from src.core.abstract_repositories.db_repository import ICRUDRepository
+from src.db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
 from src.modules.click.models import Click
 from src.modules.click.schemas import (
     SClickCreate,
@@ -11,11 +12,13 @@ class ClickService:
     def __init__(self, repo: ICRUDRepository):
         self.repo = repo
 
+    @handle_service_exceptions
     async def create_clicks(self, clicks: list[SClickCreate]) -> list[SClickResponse]:
         clicks_to_create = [Click(**click.model_dump()) for click in clicks]
         created_clicks = await self.repo.create(clicks_to_create)
         return [SClickResponse.model_validate(click) for click in created_clicks]
 
+    @handle_service_exceptions
     async def get_click(self, click_id: int) -> SClickResponse:
         click = await self.repo.get_by_id(click_id)
         return SClickResponse.model_validate(click)
