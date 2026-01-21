@@ -1,6 +1,8 @@
 import json
 import logging
-from typing import Literal
+from typing import Annotated, Literal
+
+from fastapi import Depends
 
 from src.core.abstract_repositories.key_value_repository import IKeyValueRepository
 from src.core.exceptions.exceptions import PremissonDenaiedException
@@ -12,7 +14,7 @@ from src.modules.link.schemas import (
     SLinkUpdate,
     SLinkWithClicksResponse,
 )
-from src.modules.link.service.url_generator import URLGenerator
+from src.modules.link.service.url_generator import URLGenerator, get_url_generator
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +25,11 @@ class LinkService:
         self,
         repo: IORMLinkRepository,
         cache: IKeyValueRepository,
-        url_generator: URLGenerator| None = None,
+        url_generator: Annotated[URLGenerator, Depends(get_url_generator)],
     ):
         self.repo = repo
         self.cache = cache
-        self.url_generator = url_generator if url_generator else URLGenerator(cache)
+        self.url_generator = url_generator
 
     @handle_service_exceptions
     async def create(self, link_to_create: SLinkCreateDTO) -> SLinkResponse:

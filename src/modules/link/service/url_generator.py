@@ -1,5 +1,10 @@
 from string import ascii_letters, digits
+from typing import Annotated
 
+from fastapi import Depends
+
+from src.cache.redis.repositories.abstract_repository import IRedisRepository
+from src.cache.redis.repositories.repository import get_redis
 from src.core.abstract_repositories.key_value_repository import IKeyValueRepository
 
 
@@ -47,3 +52,9 @@ class URLGenerator:
     async def del_cache(self):
         await self.cache.delete("current")
         self.ready = False
+
+
+async def get_url_generator(
+    cache: Annotated[IRedisRepository, Depends(get_redis)],
+) -> URLGenerator:
+    return URLGenerator(cache)
