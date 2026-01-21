@@ -25,8 +25,8 @@ class SUserInDB(BaseModel):
 
 class SUserUpdate(BaseModel):
     id: int
-    email: str | None = None
-    password: str | None = None
+    email: EmailStr | None = None
+    password: Annotated[str, Field(min_length=8)] | None = None
     tarifplan: UserTarifPlan | None = None
 
 
