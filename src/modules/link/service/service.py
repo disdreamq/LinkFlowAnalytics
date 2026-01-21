@@ -23,11 +23,11 @@ class LinkService:
         self,
         repo: IORMLinkRepository,
         cache: IKeyValueRepository,
-        url_generator: URLGenerator,
+        url_generator: URLGenerator| None = None,
     ):
         self.repo = repo
         self.cache = cache
-        self.url_generator = url_generator
+        self.url_generator = url_generator if url_generator else URLGenerator(cache)
 
     @handle_service_exceptions
     async def create(self, link_to_create: SLinkCreateDTO) -> SLinkResponse:

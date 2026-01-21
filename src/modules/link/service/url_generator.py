@@ -1,6 +1,6 @@
 from string import ascii_letters, digits
 
-from src.cache.redis.repositories.repository import redis
+from src.core.abstract_repositories.key_value_repository import IKeyValueRepository
 
 
 class URLGenerator:
@@ -10,8 +10,8 @@ class URLGenerator:
     current state(self.current) from cache, uses generator for generate urls.
     """
 
-    def __init__(self):
-        self.redis = redis
+    def __init__(self, cache: IKeyValueRepository):
+        self.cache = cache
         self.alphabet = ascii_letters + digits
         self.current = [0, 0, 0, 0, 0]
         self.ready = False
@@ -26,8 +26,8 @@ class URLGenerator:
         self.current[-1] += 1
         yield url
 
-    async def initialize(self):
-        cached_current = await self.redis.get("current")
+    async def _initialize(self):
+        cached_current = await self.cache.get("current")
         if cached_current:
             self.current = [int(elem) for elem in cached_current.split(",")]
         self.current[4] += 1
@@ -36,13 +36,10 @@ class URLGenerator:
 
     async def get_url(self):
         if not self.ready:
-            await self.initialize()
+            await self._initialize()
 
-        await self.redis.set_("current", ",".join([str(elem) for elem in self.current]))
+        await self.cache.set_("current", ",".join([str(elem) for elem in self.current]))
         return next(self.generator())
 
     async def del_cache(self):
-        return await self.redis.delete("current")
-
-
-url_generator = URLGenerator()
+        return await self.cache.delete("current")

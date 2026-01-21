@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.cache.local_memory.repositories.repository import in_memory_cache
 from src.core.exceptions.exceptions import PremissonDenaiedException
 from src.modules.click.schemas import SClickResponse
 from src.modules.link.schemas import SLinkResponse, SLinkWithClicksResponse
