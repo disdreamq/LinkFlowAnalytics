@@ -176,6 +176,21 @@ class TestUserServiceGetWithLinks:
         assert result.id == user_with_links["id"]
         assert result.email == user_with_links["email"]
 
+    @pytest.mark.asyncio
+    async def test_get_with_links_success_empty_links(
+        self, mock_user_repo, user_service, sample_user_data
+    ):
+        """Test for get_with_links success"""
+        user_with_links = {**sample_user_data}
+        mock_user_repo.get_with_links.return_value = user_with_links
+
+        result = await user_service.get_with_links(user_with_links["id"])
+
+        assert isinstance(result, SUserWithLinks)
+        assert result.id == user_with_links["id"]
+        assert result.email == user_with_links["email"]
+        assert len(result.links) == 0
+
     @pytest.mark.parametrize(
         "Db_exception, buisuness_exception",
         [
@@ -263,7 +278,7 @@ class TestUserServiceDelete:
         ],
     )
     @pytest.mark.asyncio
-    async def test_update_fail(
+    async def test_delete_fail(
         self,
         mock_user_repo,
         user_service,
