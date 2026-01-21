@@ -24,7 +24,8 @@ class LocalMemoryRepository(ILocalMemoryRepository):
     async def get(self, key: str) -> str | None:
         async with self._lock:
             await self._cleanup_expired()
-            return str(self._storage.get(key, None))
+            item = self._storage.get(key, None)
+            return str(item[0]) if item else None
 
     async def delete(self, key: str) -> int:
         async with self._lock:
@@ -58,7 +59,10 @@ class LocalMemoryRepository(ILocalMemoryRepository):
             return self._storage[key][0]
         return []
 
-    async def _cleanup_expired(self) -> None:
+    async def clear_all(self):
+        self._storage = {}
+
+    async def _cleanup_expired(self):
         current_time = datetime.now()
         if current_time - self._last_cleanup < self._cleanup_interval:
             return
@@ -68,5 +72,6 @@ class LocalMemoryRepository(ILocalMemoryRepository):
                 del self._storage[key]
 
         self._last_cleanup = datetime.now()
+
 
 in_memory_cache = LocalMemoryRepository()

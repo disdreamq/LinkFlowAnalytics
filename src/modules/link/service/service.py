@@ -43,7 +43,6 @@ class LinkService:
         await self._verify_id(user_id, link_url)
         link_in_db = await self.repo.get_by_url(link_url)
         link = SLinkResponse.model_validate(link_in_db)
-        await self.cache.set_(f"link_url_{link_url}", link.model_dump_json(), expire=10)
         logger.info(f"Returned link {link_url=} for user with id {user_id}")
         return link
 
