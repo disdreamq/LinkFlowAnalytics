@@ -8,7 +8,7 @@ from src.modules.user.schemas import SUserCreate, SUserUpdate
 from src.modules.user.service import UserService
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture()
 def mock_user_repo():
     repo = MagicMock()
 
@@ -23,12 +23,12 @@ def mock_user_repo():
     return repo
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture()
 def user_service(mock_user_repo):
     return UserService(repo=mock_user_repo)
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def sample_user_data():
     return {
         "id": 1,
@@ -40,7 +40,7 @@ def sample_user_data():
     }
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def sample_user_create(sample_user_data):
     return SUserCreate(
         email=sample_user_data["email"],
@@ -48,7 +48,7 @@ def sample_user_create(sample_user_data):
     )
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def sample_user_update(
     sample_user_data,
 ):

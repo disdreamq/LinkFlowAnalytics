@@ -3,9 +3,14 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from src.cache.local_memory.repositories.repository import in_memory_cache
+from src.cache.local_memory.repositories.repository import LocalMemoryRepository
 from src.modules.link.schemas import SLinkCreateDTO, SLinkUpdate
 from src.modules.link.service.service import LinkService
+
+
+@pytest.fixture
+def cache():
+    return LocalMemoryRepository()
 
 
 @pytest.fixture()
@@ -33,9 +38,9 @@ def mock_url_generator():
 
 
 @pytest.fixture()
-def link_service(mock_link_repo, mock_url_generator):
+def link_service(mock_link_repo, cache, mock_url_generator):
     return LinkService(
-        repo=mock_link_repo, cache=in_memory_cache, url_generator=mock_url_generator
+        repo=mock_link_repo, cache=cache, url_generator=mock_url_generator
     )
 
 
@@ -44,8 +49,8 @@ def sample_link_data():
     return {
         "id": 1,
         "user_id": 1,
-        "url": "aaaaa",
         "base_url": "https://www.example.com/",
+        "url": "aaaaa",
         "click_counter": 0,
         "created_at": datetime.datetime.now(),
         "updated_at": datetime.datetime.now(),
@@ -71,6 +76,16 @@ def sample_link_update(sample_link_data):
 @pytest.fixture(scope="session")
 def sample_links_data_dict():
     return {
-        1: 5,
-        2: 10,
+        0: 5,
+        1: 10,
+        2: 0,
     }
+@pytest.fixture(scope="session")
+def sample_links_with_incremented_click_counter(sample_link_data):
+    first_link = sample_link_data.copy()
+    first_link['click_counter'] = 5
+    second_link = sample_link_data.copy()
+    second_link['click_counter'] = 10
+    third_link = sample_link_data.copy()
+    third_link["click_counter"] = 0
+    return first_link, second_link, third_link
