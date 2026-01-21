@@ -62,4 +62,5 @@ class RedisRepository(IRedisRepository):
             return []
 
 
-redis = RedisRepository(RedisConnectionManager())
+async def get_redis() -> RedisRepository:
+    return RedisRepository(RedisConnectionManager())
