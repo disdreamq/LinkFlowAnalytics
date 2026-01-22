@@ -15,17 +15,17 @@ class LocalMemoryRepository(ILocalMemoryRepository):
         self._lock = asyncio.Lock()
 
     async def set_(self, key: str, value: Any, expire: int = 10) -> bool:
+        await self._cleanup_expired()
         async with self._lock:
-            await self._cleanup_expired()
             self._storage[key] = (value, timedelta(0, expire), datetime.now())
             return True
         return False
 
     async def get(self, key: str) -> str | None:
+        await self._cleanup_expired()
         async with self._lock:
-            await self._cleanup_expired()
             item = self._storage.get(key, None)
-            return str(item[0]) if item else None
+        return str(item[0]) if item else None
 
     async def delete(self, key: str) -> int:
         async with self._lock:
@@ -37,14 +37,14 @@ class LocalMemoryRepository(ILocalMemoryRepository):
             return bool(self._storage.get(key, None))
 
     async def add_to_arr(self, key: str, *args_to_add: Any) -> int:
+        await self._cleanup_expired()
+        data_in_cache = (
+            self._storage[key][0].split("000") if await self.exists(key) else []
+        )
         async with self._lock:
-            await self._cleanup_expired()
-            data_in_cache = (
-                self._storage[key][0].split(",") if await self.exists(key) else []
-            )
             data_in_cache.append(*args_to_add)
             self._storage[key] = (
-                ",".join(data_in_cache),
+                "000".join(data_in_cache),
                 timedelta(1),
                 datetime.now(),
             )
@@ -52,10 +52,10 @@ class LocalMemoryRepository(ILocalMemoryRepository):
         return 0
 
     async def get_arr(self, key: str) -> list[Any]:
+        await self._cleanup_expired()
         async with self._lock:
-            await self._cleanup_expired()
-            return self._storage[key][0]
-        return []
+            arr = self._storage.get(key, None)
+        return arr[0].split('000') if arr else []
 
     async def clear_all(self):
         self._storage = {}
