@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from src.cache.redis.repositories.abstract_repository import IRedisRepository
-from src.cache.redis.repositories.repository import RedisRepository, get_redis
+from src.cache.redis.repositories.repository import get_redis
 from src.core.exceptions.exceptions import BusinessLogicException
 from src.modules.click.dependencies import get_click_service
 from src.modules.click.schemas import SClickCreate, SClickResponse
@@ -20,11 +20,12 @@ class ClickBuffer:
     Every redirect adding this click to array in cache, when
     lenght of array >= self.max_lenght adding all clicks from cache to db.
     """
+
     def __init__(
         self,
         click_service: Annotated[ClickService, Depends(get_click_service)],
         link_service: Annotated[LinkService, Depends(get_link_service)],
-        cache: IRedisRepository,
+        cache: Annotated[IRedisRepository, Depends(get_redis)],
         max_lenght: int = 10,
     ):
         self.cache = cache
@@ -36,7 +37,7 @@ class ClickBuffer:
 
     async def add_click(self, click: SClickCreate):
         if not self.ready:
-            await self.initialize()
+            await self._initialize()
         res = await self.cache.add_to_arr("buffered_clicks", click.model_dump_json())
 
         if res == 0:
@@ -49,15 +50,14 @@ class ClickBuffer:
         await self.cache.set_("buffer_counter", self.counter)
         logger.info(f"added click {click}")
 
-        if self.counter >= 10:
-            await self.write_buffer_to_bd()
+        if self.counter >= self.max_lenght:
+            await self._write_buffer_to_db()
 
-    async def write_buffer_to_bd(self):
-        """Adding clicks to db and increment click counters for links
-        """
+    async def _write_buffer_to_db(self):
+        """Adding clicks to db and increment click counters for links"""
         data = await self.cache.get_arr("buffered_clicks")
         clicks = [SClickCreate.model_validate_json(click) for click in data]
-        clicks_in_db = await self.click_service.create_clicks(clicks)
+        clicks_in_db = await self.click_service.create(clicks)
         clicks_dict = _get_increments_for_links(clicks_in_db)
         await self.link_service.increment_click_counters(clicks_dict)
         self.counter = 0
@@ -66,9 +66,9 @@ class ClickBuffer:
 
         logger.info(f"Clicks {clicks} added to database")
 
-    async def initialize(self):
-        counter_in_redis = await self.cache.get("buffer_counter")
-        self.counter = int(counter_in_redis) if counter_in_redis else 0
+    async def _initialize(self):
+        counter_in_cache = await self.cache.get("buffer_counter")
+        self.counter = int(counter_in_cache) if counter_in_cache else 0
         self.ready = True
 
 
