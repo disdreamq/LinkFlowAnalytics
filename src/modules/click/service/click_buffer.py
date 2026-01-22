@@ -58,7 +58,7 @@ class ClickBuffer:
         data = await self.cache.get_arr("buffered_clicks")
         clicks = [SClickCreate.model_validate_json(click) for click in data]
         clicks_in_db = await self.click_service.create(clicks)
-        clicks_dict = _get_increments_for_links(clicks_in_db)
+        clicks_dict = self._get_increments_for_links(clicks_in_db)
         await self.link_service.increment_click_counters(clicks_dict)
         self.counter = 0
         await self.cache.set_("buffer_counter", self.counter)
@@ -72,13 +72,13 @@ class ClickBuffer:
         self.ready = True
 
 
-def _get_increments_for_links(clicks: list[SClickResponse]) -> dict[int, int]:
-    link_ids = {}
+    def _get_increments_for_links(self, clicks: list[SClickResponse]) -> dict[int, int]:
+        link_ids = {}
 
-    for click in clicks:
-        link_ids[click.link_id] = link_ids.get(click.link_id, 0) + 1
+        for click in clicks:
+            link_ids[click.link_id] = link_ids.get(click.link_id, 0) + 1
 
-    return link_ids
+        return link_ids
 
 
 async def get_buffer(
