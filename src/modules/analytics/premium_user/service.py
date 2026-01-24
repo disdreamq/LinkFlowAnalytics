@@ -8,54 +8,59 @@ from src.modules.user.dependencies import get_user_service
 from src.modules.user.service import UserService
 
 
-async def get_distribution_by_browser_for_link(
-    user_id: int,
-    link_url: str,
-    link_service: Annotated[LinkService, Depends(get_link_service)],
-) -> dict[str, int]:
-    link = await link_service.get_with_clicks(user_id=user_id, link_url=link_url)
-    result: dict[str, int] = {}
+class PremiumUserAnalyticService:
+    def __init__(
+        self,
+        link_service: Annotated[LinkService, Depends(get_link_service)],
+        user_service: Annotated[UserService, Depends(get_user_service)],
+    ):
+        self.link_service = link_service
+        self.user_service = user_service
 
-    for click in link.clicks:
-        # User_agent example from click table: # "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:145.0) Gecko/20100101 Firefox/145.0"
-        browser = click.user_agent[: click.user_agent.find(" ")]
-        result[browser] = result.get(browser, 0) + 1
-
-    return result
-
-
-async def get_full_distribution_by_browser_for_user(
-    user_id: int,
-    link_service: Annotated[LinkService, Depends(get_link_service)],
-    user_service: Annotated[UserService, Depends(get_user_service)],
-) -> dict[str, int]:
-    full_browser_statistics: dict[str, int] = {}
-    links_stats = await _get_list_of_distribution_by_browser_for_user(
-        user_id, link_service, user_service
-    )
-
-    for stat in links_stats:
-        for browser in stat:
-            full_browser_statistics[browser] = (
-                full_browser_statistics.get(browser, 0) + stat[browser]
-            )
-
-    return full_browser_statistics
-
-
-async def _get_list_of_distribution_by_browser_for_user(
-    user_id: int,
-    link_service: Annotated[LinkService, Depends(get_link_service)],
-    user_service: Annotated[UserService, Depends(get_user_service)],
-) -> list[dict[str, int]]:
-    links_statistics: list[dict[str, int]] = []
-
-    user = await user_service.get_with_links(user_id)
-
-    for link in user.links:
-        link_stats = await get_distribution_by_browser_for_link(
-            user_id=user_id, link_url=link.url, link_service=link_service
+    async def get_distribution_by_browser_for_link(
+        self,
+        user_id: int,
+        link_url: str,
+    ) -> dict[str, int]:
+        link = await self.link_service.get_with_clicks(
+            user_id=user_id, link_url=link_url
         )
-        links_statistics.append(link_stats)
+        result: dict[str, int] = {}
 
-    return links_statistics
+        for click in link.clicks:
+            # User_agent example from click table: # "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:145.0) Gecko/20100101 Firefox/145.0"
+            browser = click.user_agent[: click.user_agent.find(" ")]
+            result[browser] = result.get(browser, 0) + 1
+
+        return result
+
+    async def get_full_distribution_by_browser_for_user(
+        self,
+        user_id: int,
+    ) -> dict[str, int]:
+        full_browser_statistics: dict[str, int] = {}
+        links_stats = await self._get_list_of_distribution_by_browser_for_user(user_id)
+
+        for stat in links_stats:
+            for browser in stat:
+                full_browser_statistics[browser] = (
+                    full_browser_statistics.get(browser, 0) + stat[browser]
+                )
+
+        return full_browser_statistics
+
+    async def _get_list_of_distribution_by_browser_for_user(
+        self,
+        user_id: int,
+    ) -> list[dict[str, int]]:
+        links_statistics: list[dict[str, int]] = []
+
+        user = await self.user_service.get_with_links(user_id)
+
+        for link in user.links:
+            link_stats = await self.get_distribution_by_browser_for_link(
+                user_id=user_id, link_url=link.url
+            )
+            links_statistics.append(link_stats)
+
+        return links_statistics
