@@ -5,7 +5,7 @@ from fastapi import APIRouter, status
 from fastapi.params import Depends
 
 from src.modules.analytics.base_user.service import (
-    get_distribution_by_week_days,
+    get_distribution_by_week_days_single_link,
     get_full_distribution_by_click_counter_for_user,
     get_full_distribution_by_week_days_for_user,
 )
@@ -86,7 +86,7 @@ async def get_analytics_for_link(
     distr_by_click_counter = (
         await link_service.get_for_redirect(link_url)
     ).click_counter
-    distr_by_week_days = await get_distribution_by_week_days(
+    distr_by_week_days = await get_distribution_by_week_days_single_link(
         user_id=current_user.id, link_url=link_url, service=link_service
     )
     distr_by_browser = await get_distribution_by_browser_for_link(
