@@ -31,6 +31,5 @@ class SLinkUpdate(BaseModel):
     user_id: int | None
 
 
-class SLinkWithClicksResponse(SLinkResponse):
+class SLinkWithClicks(SLinkResponse):
     clicks: list[SClickResponse] = []
-

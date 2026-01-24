@@ -12,7 +12,7 @@ from src.modules.link.schemas import (
     SLinkCreateDTO,
     SLinkResponse,
     SLinkUpdate,
-    SLinkWithClicksResponse,
+    SLinkWithClicks,
 )
 from src.modules.link.service.url_generator import URLGenerator, get_url_generator
 
@@ -49,9 +49,7 @@ class LinkService:
         return link
 
     @handle_service_exceptions
-    async def get_with_clicks(
-        self, user_id: int, link_url: str
-    ) -> SLinkWithClicksResponse:
+    async def get_with_clicks(self, user_id: int, link_url: str) -> SLinkWithClicks:
         """Get link with clicks due to eager load.
 
         Args:
@@ -66,7 +64,7 @@ class LinkService:
         logger.info(
             f"Returned link with clicks with {link_url=} for user with id {user_id}"
         )
-        return SLinkWithClicksResponse.model_validate(link_wtih_clicks)
+        return SLinkWithClicks.model_validate(link_wtih_clicks)
 
     @handle_service_exceptions
     async def update(self, user_id: int, link_to_update: SLinkUpdate) -> SLinkResponse:
