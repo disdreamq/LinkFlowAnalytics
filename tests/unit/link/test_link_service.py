@@ -5,7 +5,7 @@ import pytest
 
 from src.core.exceptions.exceptions import PremissonDenaiedException
 from src.modules.click.schemas import SClickResponse
-from src.modules.link.schemas import SLinkResponse, SLinkWithClicksResponse
+from src.modules.link.schemas import SLinkResponse, SLinkWithClicks
 
 
 class TestLinkServiceCreate:
@@ -97,7 +97,7 @@ class TestLinkServiceGetWithClicks:
             sample_link_data["id"], sample_link_data["url"]
         )
 
-        assert isinstance(result, SLinkWithClicksResponse)
+        assert isinstance(result, SLinkWithClicks)
         assert isinstance(result.clicks[0], SClickResponse)
         assert isinstance(result.clicks[1], SClickResponse)
         assert result.clicks[0].id == 1
@@ -122,7 +122,7 @@ class TestLinkServiceGetWithClicks:
             sample_link_data["id"], sample_link_data["url"]
         )
 
-        assert isinstance(result, SLinkWithClicksResponse)
+        assert isinstance(result, SLinkWithClicks)
         assert result.id == sample_link_data["id"]
         assert result.user_id == sample_link_data["user_id"]
         assert result.base_url == sample_link_data["base_url"]
@@ -231,4 +231,3 @@ class TestLinkServiceGetForRedirect:
 
         assert isinstance(result, SLinkResponse)
         assert result.url == sample_link_data["url"]
-
