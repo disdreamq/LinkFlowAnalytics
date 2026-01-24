@@ -4,12 +4,12 @@ from typing import Annotated
 from fastapi import APIRouter, status
 from fastapi.params import Depends
 
+from src.modules.analytics.base_user.dependencies import get_base_user_analytics_service
 from src.modules.analytics.base_user.schemas import (
     SBaseUserAllLinksResponse,
     SBaseUserSingleLinkResponse,
 )
 from src.modules.analytics.base_user.service import BaseUserAnalyticService
-from src.modules.analytics.dependencies import get_base_user_analytics_service
 from src.modules.auth.dependencies import require_auth
 from src.modules.user.schemas import SUserInDB
 
@@ -69,7 +69,7 @@ async def get_analytics_for_link(
         BaseUserAnalyticService, Depends(get_base_user_analytics_service)
     ],
 ):
-    distr_by_week_days = (
+    distr_by_week_days = ( # 0 indexing click_counter, 1 indexing distr
         await analytic_service.get_distribution_by_week_days_single_link(
             user_id=current_user.id, link_url=link_url
         )
