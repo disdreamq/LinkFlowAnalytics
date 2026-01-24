@@ -8,113 +8,124 @@ from src.modules.user.dependencies import get_user_service
 from src.modules.user.service import UserService
 
 
-async def get_distribution_by_week_days_single_link(
-    user_id: int,
-    link_url: str,
-    service: Annotated[LinkService, Depends(get_link_service)],
-) -> dict[str, int]:
-    """Returns distribution for single link by week days
+class BaseUserAnalyticService:
+    def __init__(
+        self,
+        link_service: Annotated[LinkService, Depends(get_link_service)],
+        user_service: Annotated[UserService, Depends(get_user_service)],
+    ):
+        self.link_service = link_service
+        self.user_service = user_service
 
-    Args:
-        user_id (int)
-        link_url (str)
-        service LinkService (Depends)
+    async def get_distribution_by_week_days_single_link(
+        self,
+        user_id: int,
+        link_url: str,
+    ) -> tuple[int, dict[str, int]]:
+        """Returns distribution for single link by week days
 
-    Returns:
-        dict[str, int]: dict with distribution by week days
-    """
-    result: dict[str, int] = {}
-    link = await service.get_with_clicks(user_id=user_id, link_url=link_url)
-    for click in link.clicks:
-        result[f'{click.created_at.strftime("%A")}'] = (
-            result.get(f'{click.created_at.strftime("%A")}', 0) + 1
+        Args:
+            user_id (int)
+            link_url (str)
+            service LinkService (Depends)
+
+        Returns:
+            dict[str, int]: dict with distribution by week days
+        """
+
+        result: dict[str, int] = {}
+        link = await self.link_service.get_with_clicks(
+            user_id=user_id, link_url=link_url
         )
-
-    return result
-
-
-async def _get_list_of_distribution_by_week_days_for_user(
-    user_id: int,
-    link_service: Annotated[LinkService, Depends(get_link_service)],
-    user_service: Annotated[UserService, Depends(get_user_service)],
-) -> list[dict[str, int]]:
-    """Helper for getting list of dicts with distribution by week days for user
-
-    Args:
-        user_id: int
-        link_service: LinkService(Depends)
-        user_service: UserService(Depends)
-
-    Returns:
-        list[dict[str, int]]: List of dicts with distribution by week days
-        from func get_distribution_by_week_days_single_link
-    """
-    links_statistics: list[dict[str, int]] = []
-
-    user = await user_service.get_with_links(user_id)
-
-    for link in user.links:
-        link_stats = await get_distribution_by_week_days_single_link(
-            user_id=user_id, link_url=link.url, service=link_service
-        )
-        links_statistics.append(link_stats)
-
-    return links_statistics
-
-
-async def get_full_distribution_by_week_days_for_user(
-    user_id: int,
-    link_service: Annotated[LinkService, Depends(get_link_service)],
-    user_service: Annotated[UserService, Depends(get_user_service)],
-) -> dict[str, int]:
-    """Function for getting full distribution by week days for user
-    returns dict with this distribution, including all links with link.user_id equal
-    to provided user_id
-
-    Args:
-        user_id: int
-        link_service: LinkService(Depends)
-        user_service: UserService(Depends)
-
-    Returns:
-        dict[str, int]: Dict with distribution by week days
-    """
-    full_week_days_statistics: dict[str, int] = {}
-
-    links_stats = await _get_list_of_distribution_by_week_days_for_user(
-        user_id, link_service, user_service
-    )
-
-    for stat in links_stats:
-        for week_day in stat:
-            full_week_days_statistics[week_day] = (
-                full_week_days_statistics.get(week_day, 0) + stat[week_day]
+        click_counter = link.click_counter
+        for click in link.clicks:
+            result[f'{click.created_at.strftime("%A")}'] = (
+                result.get(f'{click.created_at.strftime("%A")}', 0) + 1
             )
 
-    return full_week_days_statistics
+        return click_counter, result
 
+    async def _get_list_of_distribution_by_week_days_for_user(
+        self,
+        user_id: int,
+    ) -> list[dict[str, int]]:
+        """Helper for getting list of dicts with distribution by week days for user
 
-async def get_full_distribution_by_click_counter_for_user(
-    user_id: int,
-    user_service: Annotated[UserService, Depends(get_user_service)],
-) -> dict[str, int]:
-    """Function for getting full distribution by click counter for user
-    returns dict with this distribution, including all links with link.user_id equal
-    to provided user_id
-    Args:
-        user_id: int
-        user_service: UserService(Depends)
+        Args:
+            user_id: int
+            link_service: LinkService(Depends)
+            user_service: UserService(Depends)
 
-    Returns:
-        dict[str, int]: Dict with distribution by click counter
-    """
-    full_click_counter_statistics: dict[str, int] = {}
+        Returns:
+            list[dict[str, int]]: List of dicts with distribution by week days
+            from func get_distribution_by_week_days_single_link
+        """
 
-    user = await user_service.get_with_links(user_id)
+        links_statistics: list[dict[str, int]] = []
 
-    for link in user.links:
-        full_click_counter_statistics[link.url] = (
-            full_click_counter_statistics.get(link.url, 0) + link.click_counter
+        user = await self.user_service.get_with_links(user_id)
+
+        for link in user.links:
+            link_stats = await self.get_distribution_by_week_days_single_link(
+                user_id=user_id, link_url=link.url
+            )
+            links_statistics.append(link_stats[1])
+
+        return links_statistics
+
+    async def get_full_distribution_by_week_days_for_user(
+        self,
+        user_id: int,
+    ) -> dict[str, int]:
+        """Function for getting full distribution by week days for user
+        returns dict with this distribution, including all links with link.user_id equal
+        to provided user_id
+
+        Args:
+            user_id: int
+            link_service: LinkService(Depends)
+            user_service: UserService(Depends)
+
+        Returns:
+            dict[str, int]: Dict with distribution by week days
+        """
+
+        full_week_days_statistics: dict[str, int] = {}
+
+        links_stats = await self._get_list_of_distribution_by_week_days_for_user(
+            user_id,
         )
 
-    return full_click_counter_statistics
+        for stat in links_stats:
+            for week_day in stat:
+                full_week_days_statistics[week_day] = (
+                    full_week_days_statistics.get(week_day, 0) + stat[week_day]
+                )
+
+        return full_week_days_statistics
+
+    async def get_full_distribution_by_click_counter_for_user(
+        self,
+        user_id: int,
+    ) -> dict[str, int]:
+        """Function for getting full distribution by click counter for user
+        returns dict with this distribution, including all links with link.user_id equal
+        to provided user_id
+        Args:
+            user_id: int
+            user_service: UserService(Depends)
+
+        Returns:
+            dict[str, int]: Dict with distribution by click counter
+        """
+
+        full_click_counter_statistics: dict[str, int] = {}
+
+        user = await self.user_service.get_with_links(user_id)
+
+        for link in user.links:
+            full_click_counter_statistics[link.url] = (
+                full_click_counter_statistics.get(link.url, 0) + link.click_counter
+            )
+
+        return full_click_counter_statistics
