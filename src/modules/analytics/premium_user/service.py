@@ -17,11 +17,21 @@ class PremiumUserAnalyticService:
         self.link_service = link_service
         self.user_service = user_service
 
-    async def get_distribution_by_browser_for_link(
+    async def get_distribution_by_browser_single_link(
         self,
         user_id: int,
         link_url: str,
     ) -> dict[str, int]:
+        """Func returns a dict with browser as a key and summ of clicks from this
+        browser as a value
+
+        Args:
+            user_id: int
+            link_url: str
+
+        Returns:
+            dict[str, int]: dict with browser: sum of clicks from this browser
+        """
         link = await self.link_service.get_with_clicks(
             user_id=user_id, link_url=link_url
         )
@@ -34,12 +44,12 @@ class PremiumUserAnalyticService:
 
         return result
 
-    async def get_full_distribution_by_browser_for_user(
+    async def get_full_distribution_by_browser(
         self,
         user_id: int,
     ) -> dict[str, int]:
         full_browser_statistics: dict[str, int] = {}
-        links_stats = await self._get_list_of_distribution_by_browser_for_user(user_id)
+        links_stats = await self._get_list_of_distribution_by_browser(user_id)
 
         for stat in links_stats:
             for browser in stat:
@@ -49,7 +59,7 @@ class PremiumUserAnalyticService:
 
         return full_browser_statistics
 
-    async def _get_list_of_distribution_by_browser_for_user(
+    async def _get_list_of_distribution_by_browser(
         self,
         user_id: int,
     ) -> list[dict[str, int]]:
@@ -58,7 +68,7 @@ class PremiumUserAnalyticService:
         user = await self.user_service.get_with_links(user_id)
 
         for link in user.links:
-            link_stats = await self.get_distribution_by_browser_for_link(
+            link_stats = await self.get_distribution_by_browser_single_link(
                 user_id=user_id, link_url=link.url
             )
             links_statistics.append(link_stats)
