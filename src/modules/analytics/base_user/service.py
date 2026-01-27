@@ -45,7 +45,7 @@ class BaseUserAnalyticService:
 
         return click_counter, result
 
-    async def _get_list_of_distribution_by_week_days_for_user(
+    async def _get_list_of_distribution_by_week_days(
         self,
         user_id: int,
     ) -> list[dict[str, int]]:
@@ -73,7 +73,7 @@ class BaseUserAnalyticService:
 
         return links_statistics
 
-    async def get_full_distribution_by_week_days_for_user(
+    async def get_full_distribution_by_week_days(
         self,
         user_id: int,
     ) -> dict[str, int]:
@@ -92,7 +92,7 @@ class BaseUserAnalyticService:
 
         full_week_days_statistics: dict[str, int] = {}
 
-        links_stats = await self._get_list_of_distribution_by_week_days_for_user(
+        links_stats = await self._get_list_of_distribution_by_week_days(
             user_id,
         )
 
@@ -104,7 +104,7 @@ class BaseUserAnalyticService:
 
         return full_week_days_statistics
 
-    async def get_full_distribution_by_click_counter_for_user(
+    async def get_full_distribution_by_click_counter(
         self,
         user_id: int,
     ) -> dict[str, int]:

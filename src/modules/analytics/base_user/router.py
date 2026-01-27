@@ -35,14 +35,10 @@ async def get_full_links_analytics(
     ],
 ):
     distr_for_click_counter = (
-        await analytic_service.get_full_distribution_by_click_counter_for_user(
-            current_user.id
-        )
+        await analytic_service.get_full_distribution_by_click_counter(current_user.id)
     )
-    distr_by_week_days = (
-        await analytic_service.get_full_distribution_by_week_days_for_user(
-            current_user.id
-        )
+    distr_by_week_days = await analytic_service.get_full_distribution_by_week_days(
+        current_user.id
     )
     return SBaseUserAllLinksResponse(
         user_id=current_user.id,
@@ -69,7 +65,7 @@ async def get_analytics_for_link(
         BaseUserAnalyticService, Depends(get_base_user_analytics_service)
     ],
 ):
-    distr_by_week_days = ( # 0 indexing click_counter, 1 indexing distr
+    distr_by_week_days = (  # 0 indexing click_counter, 1 indexing distr
         await analytic_service.get_distribution_by_week_days_single_link(
             user_id=current_user.id, link_url=link_url
         )
