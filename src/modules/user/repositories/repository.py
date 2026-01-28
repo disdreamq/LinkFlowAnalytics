@@ -70,7 +70,7 @@ class SQLAlchemyUserRepository(IORMUserRepository):
             stmt = select(User).filter(User.email == email)
             result = await self.session.execute(stmt)
             user = result.scalar_one_or_none()
-            return not user
+            return bool(user)
 
     @asynccontextmanager
     async def _handle_db_error(self, operation: str, **context):
