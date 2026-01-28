@@ -1,8 +1,13 @@
+from unittest.mock import MagicMock
+
+import fakeredis
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from main import app
+from src.cache.redis.connection import RedisConnectionManager
+from src.cache.redis.repositories.repository import RedisRepository, get_redis
 from src.db.base import Base
 from src.modules.dependencies import get_session
 from tests.integration.dependencies import DependencyOverrides
@@ -38,6 +43,27 @@ async def get_client():
     return ac
 
 
+@pytest.fixture
+def fake_redis_client():
+    client = fakeredis.FakeStrictRedis(decode_responses=True, encoding="utf-8")
+
+    client.set("test:key", "test_value")
+
+    return client
+
+
+@pytest.fixture
+def redis_repository_mock(fake_redis_client):
+    """Mocking RedisRepository"""
+    mock_manager = MagicMock(spec=RedisConnectionManager)
+
+    mock_manager.client = fake_redis_client
+
+    repo = RedisRepository(mock_manager)
+
+    return repo
+
+
 @pytest.fixture()
 async def deps():
     overrides = DependencyOverrides(app)
@@ -50,7 +76,11 @@ async def client(deps, db_session):
     async def override_get_session():
         yield db_session
 
+    async def override_get_redis():
+        return redis_repository_mock
+
     deps.set(get_session, override_get_session)
+    deps.set(get_redis, override_get_redis)
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://testserver", timeout=30.0
