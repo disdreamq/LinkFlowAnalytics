@@ -1,7 +1,10 @@
 import logging
 from typing import Literal
 
-from src.core.exceptions.exceptions import AlreadyExistsException
+from src.core.exceptions.exceptions import (
+    AlreadyExistsException,
+    PremissonDenaiedException,
+)
 from src.core.security import get_password_hash
 from src.db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
 from src.modules.user.repositories.abstract_repositories import IORMUserRepository
@@ -41,7 +44,8 @@ class UserService:
         return SUserResponse.model_validate(new_user)
 
     @handle_service_exceptions
-    async def get_by_id(self, user_id: int) -> SUserInDB:
+    async def get_by_id(self, current_user_id: int, user_id: int) -> SUserInDB:
+        await self._verify_id(current_user_id, user_id)
         user = await self.repo.get_by_id(user_id)
         logger.info(f"Service returned user with {user_id=}")
         return SUserInDB.model_validate(user)
@@ -67,7 +71,10 @@ class UserService:
         return SUserWithLinks.model_validate(user)
 
     @handle_service_exceptions
-    async def update(self, user_to_update: SUserUpdate) -> SUserResponse:
+    async def update(
+        self, current_user_id: int, user_to_update: SUserUpdate
+    ) -> SUserResponse:
+        await self._verify_id(current_user_id, user_to_update.id)
         user_data = user_to_update.model_dump(
             exclude_unset=True,
             exclude_none=True,
@@ -77,6 +84,14 @@ class UserService:
         return SUserResponse.model_validate(updated_user)
 
     @handle_service_exceptions
-    async def delete(self, user_id) -> Literal[True]:
+    async def delete(self, current_user_id: int, user_id) -> Literal[True]:
+        await self._verify_id(current_user_id, user_id)
         logger.info(f"Service deleted user with {user_id=}")
         return await self.repo.delete(user_id)
+
+    @handle_service_exceptions
+    async def _verify_id(self, current_user_id: int, user_id: int):
+        if current_user_id != 1 and current_user_id != user_id:
+            raise PremissonDenaiedException(
+                f"Can not verify {current_user_id=} with {user_id=}"
+            )

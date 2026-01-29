@@ -104,7 +104,7 @@ class BaseUserAnalyticService:
 
         return full_week_days_statistics
 
-    async def get_full_distribution_by_click_counter(
+    async def get_full_distribution_by_url(
         self,
         user_id: int,
     ) -> dict[str, int]:

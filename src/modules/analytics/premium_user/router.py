@@ -47,7 +47,7 @@ async def get_full_links_analytics(
     ],
 ):
     distr_by_click_counter = (
-        await base_user_analytic_service.get_full_distribution_by_click_counter(
+        await base_user_analytic_service.get_full_distribution_by_url(
             current_user.id,
         )
     )
