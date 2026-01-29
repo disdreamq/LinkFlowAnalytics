@@ -95,7 +95,7 @@ class TestUserServiceGetById:
         ],
     )
     @pytest.mark.asyncio
-    async def test_user_by_email_fail(
+    async def test_get_by_email_fail(
         self, mock_user_repo, user_service, Db_exception, buisuness_exception
     ):
         mock_user_repo.get_by_email.side_effect = Db_exception("1", "2", "3")
@@ -107,12 +107,12 @@ class TestUserServiceGetByEmail:
     """Tests for get_by_email"""
 
     @pytest.mark.asyncio
-    async def test_user_by_email_success(
+    async def test_get_by_email_success(
         self, mock_user_repo, user_service, sample_user_data
     ):
-        mock_user_repo.get_by_id.return_value = sample_user_data
+        mock_user_repo.get_by_email.return_value = SUserInDB(**sample_user_data)
 
-        result = await user_service.get_by_id(sample_user_data["id"])
+        result = await user_service.get_by_email(sample_user_data["email"])
 
         assert isinstance(result, SUserInDB)
         assert result.id == sample_user_data["id"]
@@ -132,7 +132,7 @@ class TestUserServiceGetByEmail:
     ):
         mock_user_repo.get_by_id.side_effect = Db_exception("1", "2", "3")
         with pytest.raises(buisuness_exception):
-            await user_service.get_by_id(52)
+            await user_service.get_by_id(52, 52)
 
 
 class TestUserServiceGetWithLinks:
@@ -223,7 +223,7 @@ class TestUserServiceUpdate:
             updated_at=datetime.datetime.now(),
         )
 
-        result = await user_service.update(sample_user_update)
+        result = await user_service.update(sample_user_update.id, sample_user_update)
 
         assert isinstance(result, SUserResponse)
         assert result.id == sample_user_update.id
@@ -249,7 +249,7 @@ class TestUserServiceUpdate:
     ):
         mock_user_repo.update.side_effect = Db_exception("1", "2", "3")
         with pytest.raises(buisuness_exception):
-            await user_service.update(sample_user_update)
+            await user_service.update(sample_user_update.id, sample_user_update)
 
 
 class TestUserServiceDelete:
@@ -265,7 +265,7 @@ class TestUserServiceDelete:
         user_id = 1
         mock_user_repo.delete.return_value = True
 
-        result = await user_service.delete(user_id)
+        result = await user_service.delete(user_id, user_id)
 
         assert result is True
 
@@ -287,4 +287,4 @@ class TestUserServiceDelete:
     ):
         mock_user_repo.delete.side_effect = Db_exception("1", "2", "3")
         with pytest.raises(buisuness_exception):
-            await user_service.delete(52)
+            await user_service.delete(52, 52)

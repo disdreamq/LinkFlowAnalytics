@@ -225,11 +225,11 @@ class TestGFDBWD:
         assert result == {"Saturday": 2}
 
 
-class TestGFDBCC:
-    "Tests for get_full_distribution_by_click_counter"
+class TestGFDBU:
+    "Tests for get_full_distribution_by_url"
 
     @pytest.mark.asyncio
-    async def test_GFDBСС_success(
+    async def test_GFDBU_success(
         self,
         base_user_analytic_service,
         mock_user_service,
@@ -240,7 +240,7 @@ class TestGFDBCC:
         )
 
         result = (
-            await base_user_analytic_service.get_full_distribution_by_click_counter(
+            await base_user_analytic_service.get_full_distribution_by_url(
                 sample_user_with_links["id"]
             )
         )
@@ -261,7 +261,7 @@ class TestGFDBCC:
         )
 
         result = (
-            await base_user_analytic_service.get_full_distribution_by_click_counter(
+            await base_user_analytic_service.get_full_distribution_by_url(
                 sample_user_with_links["id"]
             )
         )
@@ -269,7 +269,7 @@ class TestGFDBCC:
         assert result == {}
 
     @pytest.mark.asyncio
-    async def test_GFDBСС_one_link(
+    async def test_GFDBU_one_link(
         self,
         base_user_analytic_service,
         sample_user_with_one_link,
@@ -281,7 +281,7 @@ class TestGFDBCC:
         )
 
         result = (
-            await base_user_analytic_service.get_full_distribution_by_click_counter(
+            await base_user_analytic_service.get_full_distribution_by_url(
                 sample_user_with_one_link["id"]
             )
         )

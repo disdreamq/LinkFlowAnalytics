@@ -22,25 +22,16 @@ TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind
 @pytest.fixture(scope="session", autouse=True)
 async def setup_db():
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
         yield
         await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 async def db_session():
     async with TestingSessionLocal() as session, session.begin():
         yield session
-
-
-@pytest.fixture(scope="function", autouse=True)
-async def get_client():
-    ac = AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test",
-    )
-    return ac
+        await session.commit()
 
 
 @pytest.fixture
@@ -87,12 +78,3 @@ async def client(deps, db_session):
     ) as ac:
         yield ac
     deps.clear()
-
-
-@pytest.fixture()
-def sample_user_register_data():
-    user_data = {
-        "email": "test@example.com",
-        "password": "password123",
-    }
-    return user_data
