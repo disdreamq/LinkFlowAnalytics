@@ -1,6 +1,3 @@
-from unittest.mock import MagicMock
-
-import fakeredis
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -27,7 +24,7 @@ async def setup_db():
         await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def db_session():
     async with TestingSessionLocal() as session, session.begin():
         yield session
@@ -35,24 +32,9 @@ async def db_session():
 
 
 @pytest.fixture
-def fake_redis_client():
-    client = fakeredis.FakeStrictRedis(decode_responses=True, encoding="utf-8")
-
-    client.set("test:key", "test_value")
-
-    return client
-
-
-@pytest.fixture
-def redis_repository_mock(fake_redis_client):
-    """Mocking RedisRepository"""
-    mock_manager = MagicMock(spec=RedisConnectionManager)
-
-    mock_manager.client = fake_redis_client
-
-    repo = RedisRepository(mock_manager)
-
-    return repo
+async def redis_session():
+    get_redis = RedisRepository(RedisConnectionManager(1))
+    yield get_redis
 
 
 @pytest.fixture()
@@ -63,12 +45,12 @@ async def deps():
 
 
 @pytest.fixture()
-async def client(deps, db_session):
+async def client(deps, db_session, redis_session):
     async def override_get_session():
         yield db_session
 
     async def override_get_redis():
-        return redis_repository_mock
+        return redis_session
 
     deps.set(get_session, override_get_session)
     deps.set(get_redis, override_get_redis)
@@ -77,4 +59,25 @@ async def client(deps, db_session):
         transport=ASGITransport(app=app), base_url="http://testserver", timeout=30.0
     ) as ac:
         yield ac
-    deps.clear()
+
+
+@pytest.fixture(autouse=True)
+async def register_admin_user(client):
+    admin_data = {"email": "admin@example.com", "password": "adminadmin"}
+    await client.post(
+        "/users/",
+        json=admin_data,
+    )
+
+
+@pytest.fixture()
+async def admin_user(client):
+    admin_data = {"email": "admin@example.com", "password": "adminadmin"}
+    response = await client.post(
+        "/token",
+        data={"username": admin_data["email"], "password": admin_data["password"]},
+    )
+    token = response.json()["access_token"]
+    header = {"Authorization": f"Bearer {token}"}
+    resp = await client.get("users/1", headers=header)
+    return {"data": resp.json(), "header": header}
