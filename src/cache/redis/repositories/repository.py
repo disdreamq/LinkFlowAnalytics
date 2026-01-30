@@ -61,6 +61,13 @@ class RedisRepository(IRedisRepository):
             logger.exception(f"Redis add error: {e}")
             return []
 
+    async def flushdb(self):
+        try:
+            async with self.connection_manager.get_connection() as conn:
+                return await conn.flushdb()
+        except RedisError as e:
+            logger.exception(f"Redis add error: {e}")
+
 
 async def get_redis() -> RedisRepository:
-    return RedisRepository(RedisConnectionManager())
+    return RedisRepository(RedisConnectionManager(0))

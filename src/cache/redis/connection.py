@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class RedisConnectionManager:
-    def __init__(self):
+    def __init__(self, db_number):
         self._pool: redis.Redis | None = None
+        self.db_number = db_number
 
     async def create_pool(self):
         if self._pool is None:
@@ -20,6 +21,7 @@ class RedisConnectionManager:
                 encoding="utf-8",
                 decode_responses=True,
                 max_connections=10,
+                db=self.db_number,
             )
 
     @asynccontextmanager
