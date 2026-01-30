@@ -25,7 +25,7 @@ router = APIRouter(prefix="/links", tags=["links"])
     description="Create a shor URL for simplify base URL",
     responses={
         201: {"description": "URL successfully created"},
-        400: {"description": "Invalid URL provided"},
+        422: {"description": "Invalid URL provided"},
         500: {"description": "Internal server error"},
     },
 )

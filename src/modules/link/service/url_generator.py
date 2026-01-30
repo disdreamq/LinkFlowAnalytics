@@ -33,8 +33,7 @@ class URLGenerator:
         yield url
 
     async def _initialize(self):
-        cached_current = await self.cache.get("current")
-        if cached_current:
+        if cached_current:= await self.cache.get("current"):
             self.current = [int(elem) for elem in cached_current.split(",")]
             self.current[4] += 1
         else:
