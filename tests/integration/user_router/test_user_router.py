@@ -99,7 +99,6 @@ class TestGetUser:
         response = await client.get("/users/1", headers=admin_user["header"])
         assert response.status_code == 200
         data = response.json()
-        print(data, admin_user)
         assert data["id"] == admin_user["data"]["id"]
         assert data["email"] == admin_user["data"]["email"]
 
