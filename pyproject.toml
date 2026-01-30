@@ -32,7 +32,6 @@ httpx = "^0.28.1"
 psycopg = "^3.3.2"
 psycopg2 = "^2.9.11"
 aiosqlite = "^0.22.1"
-fakeredis = "^2.33.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -421,29 +421,6 @@ dnspython = ">=2.0.0"
 idna = ">=2.0.0"
 
 [[package]]
-name = "fakeredis"
-version = "2.33.0"
-description = "Python implementation of redis API, can be used for testing purposes."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "fakeredis-2.33.0-py3-none-any.whl", hash = "sha256:de535f3f9ccde1c56672ab2fdd6a8efbc4f2619fc2f1acc87b8737177d71c965"},
-    {file = "fakeredis-2.33.0.tar.gz", hash = "sha256:d7bc9a69d21df108a6451bbffee23b3eba432c21a654afc7ff2d295428ec5770"},
-]
-
-[package.dependencies]
-redis = {version = ">=4.3", markers = "python_version > \"3.8\""}
-sortedcontainers = ">=2"
-
-[package.extras]
-bf = ["pyprobables (>=0.6)"]
-cf = ["pyprobables (>=0.6)"]
-json = ["jsonpath-ng (>=1.6)"]
-lua = ["lupa (>=2.1)"]
-probabilistic = ["pyprobables (>=0.6)"]
-valkey = ["valkey (>=6)"]
-
-[[package]]
 name = "fastapi"
 version = "0.121.3"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -1947,17 +1924,6 @@ files = [
 ]
 
 [[package]]
-name = "sortedcontainers"
-version = "2.4.0"
-description = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
-optional = false
-python-versions = "*"
-files = [
-    {file = "sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
-    {file = "sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
-]
-
-[[package]]
 name = "sqlalchemy"
 version = "2.0.44"
 description = "Database Abstraction Library"
@@ -2430,4 +2396,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "44f668bf59beadd8bcb911372bfb422da2ab41321ccac2dad7ef599e9ebba7e2"
+content-hash = "b5c5b48ff74de39846fe6808cf4eceb6561eed17ceff4405b6f285fe0ed05f8a"
