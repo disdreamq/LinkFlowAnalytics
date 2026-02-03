@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Path, status
 
 from src.modules.auth.dependencies import require_auth
 from src.modules.link.dependencies import get_link_service
@@ -53,8 +53,8 @@ async def create_link(
         500: {"description": "Internal server error"},
     },
 )
-async def get_link_by_short_url(
-    link_url: str,
+async def get_link_by_url(
+    link_url: Annotated[str, Path(pattern="^[A-Za-z0-9]{5}$")],
     service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
@@ -75,9 +75,9 @@ async def get_link_by_short_url(
     },
 )
 async def delete_link(
-    link_url: str,
+    link_url: Annotated[str, Path(pattern="^[A-Za-z0-9]{5}$")],
     service: Annotated[LinkService, Depends(get_link_service)],
     current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
     await service.delete(user_id=current_user.id, link_url=link_url)
-    return {"ok": True}
+    return

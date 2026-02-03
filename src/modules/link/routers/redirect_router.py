@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Path, Request, status
 from fastapi.responses import RedirectResponse
 
 from src.modules.click.schemas import SClickCreate
@@ -26,7 +26,7 @@ router = APIRouter(tags=["redirect"])
     },
 )
 async def redirect(
-    link_url: str,
+    url: Annotated[str, Path(pattern="^[A-Za-z0-9]{5}$")],
     service: Annotated[LinkService, Depends(get_link_service)],
     buffer: Annotated[ClickBuffer, Depends(get_buffer)],
     background_tasks: BackgroundTasks,
@@ -34,7 +34,7 @@ async def redirect(
 ):
     user_agent = request.headers.get("user-agent", "Unknown")
     user_ip = request.client.host if request.client else None
-    link = await service.get_for_redirect(link_url=link_url)
+    link = await service.get_for_redirect(link_url=url)
     new_click = SClickCreate(
         link_id=link.id,
         user_agent=user_agent,
