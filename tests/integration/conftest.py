@@ -16,7 +16,7 @@ engine = create_async_engine(url=TEST_DATABASE_URL)
 TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 async def setup_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
