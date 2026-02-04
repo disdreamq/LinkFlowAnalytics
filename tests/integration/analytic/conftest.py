@@ -12,7 +12,7 @@ async def sample_link_for_analytics(created_link, client):
 
 
 @pytest.fixture
-async def empty_user(client):
+async def base_user(client):
     unique_email = f"empty_{uuid.uuid4().hex[:8]}@example.com"
     data = {"email": unique_email, "password": "password123"}
 
@@ -27,10 +27,10 @@ async def empty_user(client):
 
 
 @pytest.fixture()
-async def empty_link(empty_user, client):
+async def empty_link(base_user, client):
     link = await client.post(
         "/links/",
         json={"base_url": "https://www.example.com/"},
-        headers=empty_user["header"],
+        headers=base_user["header"],
     )
     return link.json()
