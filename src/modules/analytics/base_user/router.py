@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Path, status
 from fastapi.params import Depends
 
 from src.modules.analytics.base_user.dependencies import get_base_user_analytics_service
@@ -59,7 +59,7 @@ async def get_full_links_analytics(
     },
 )
 async def get_analytics_for_link(
-    link_url: str,
+    link_url: Annotated[str, Path(pattern="^[A-Za-z0-9]{5}$")],
     current_user: Annotated[SUserInDB, Depends(require_auth)],
     analytic_service: Annotated[
         BaseUserAnalyticService, Depends(get_base_user_analytics_service)

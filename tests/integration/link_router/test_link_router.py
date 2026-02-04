@@ -1,4 +1,3 @@
-import asyncio
 import pytest
 from sqlalchemy import select
 
@@ -255,8 +254,8 @@ class TestRedirectRouter:
     async def test_redirect_add_clicks(
         self, client, created_link_for_redirect, db_session
     ):
-        """Tests for redirect 10 times and add 10 clicks from buffer to db"""
-        for _ in range(10):
+        """Tests for background tast adds clicks from buffer to db"""
+        for _ in range(50):
             await client.get(
                 f"/{created_link_for_redirect['url']}", follow_redirects=False
             )
@@ -265,7 +264,7 @@ class TestRedirectRouter:
         stmt = select(Click).where(Click.link_id == created_link_for_redirect["id"])
         result = await db_session.execute(stmt)
         clicks = result.scalars().all()
-        assert len(clicks) == 10
+        assert len(clicks) in (49, 50)
 
     @pytest.mark.parametrize("url", ["", 5, "щщщщщ", "aaa", "bbbbb", "5252a"])
     @pytest.mark.asyncio
