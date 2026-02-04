@@ -64,10 +64,29 @@ async def client(deps, db_session, redis_session):
 @pytest.fixture(autouse=True)
 async def register_admin_user(client):
     admin_data = {"email": "admin@example.com", "password": "adminadmin"}
-    await client.post(
-        "/users/",
-        json=admin_data,
-    )
+
+    try:
+        response = await client.post(
+            "/token",
+            data={"username": admin_data["email"], "password": admin_data["password"]},
+        )
+        if response.status_code == 200:
+            pass
+        else:
+            await client.post("/users/", json=admin_data)
+            response = await client.post(
+                "/token",
+                data={
+                    "username": admin_data["email"],
+                    "password": admin_data["password"],
+                },
+            )
+    except Exception:
+        await client.post("/users/", json=admin_data)
+        response = await client.post(
+            "/token",
+            data={"username": admin_data["email"], "password": admin_data["password"]},
+        )
 
 
 @pytest.fixture()
@@ -81,3 +100,21 @@ async def admin_user(client):
     header = {"Authorization": f"Bearer {token}"}
     resp = await client.get("users/1", headers=header)
     return {"data": resp.json(), "header": header}
+
+
+@pytest.fixture
+def link_data_register():
+    link_data = {
+        "base_url": "https://www.example.com/",
+    }
+    return link_data
+
+
+@pytest.fixture
+async def created_link(admin_user, client, link_data_register):
+    response = await client.post(
+        "/links/",
+        json=link_data_register,
+        headers=admin_user["header"],
+    )
+    return response.json()
