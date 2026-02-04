@@ -21,10 +21,10 @@ class TestGFLA:
         }
 
     @pytest.mark.asyncio
-    async def test_GFLA_empty_link(self, client, empty_user):
-        response = await client.get("/analytics/summary", headers=empty_user["header"])
+    async def test_GFLA_empty_link(self, client, base_user):
+        response = await client.get("/analytics/summary", headers=base_user["header"])
 
-        assert response.json()["user_id"] == empty_user["data"]["id"]
+        assert response.json()["user_id"] == base_user["data"]["id"]
         assert response.json()["full_distribution_by_click_counter"] == {}
         assert response.json()["full_distribution_by_week_days"] == {}
 
@@ -55,9 +55,9 @@ class TestGAFL:
         }
 
     @pytest.mark.asyncio
-    async def test_GAFL_empty_link(self, client, empty_user, empty_link):
+    async def test_GAFL_empty_link(self, client, base_user, empty_link):
         response = await client.get(
-            f"/analytics/{empty_link['url']}", headers=empty_user["header"]
+            f"/analytics/{empty_link['url']}", headers=base_user["header"]
         )
 
         json = response.json()
@@ -73,11 +73,11 @@ class TestGAFL:
 
     @pytest.mark.asyncio
     async def test_GAFL_another_user(
-        self, client, sample_link_for_analytics, empty_user
+        self, client, sample_link_for_analytics, base_user
     ):
         response = await client.get(
             f"/analytics/{sample_link_for_analytics['url']}",
-            headers=empty_user["header"],
+            headers=base_user["header"],
         )
         assert response.status_code == 403
 
