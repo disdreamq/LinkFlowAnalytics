@@ -22,7 +22,7 @@ LinkFlowAnalytics - это учебный проект по сокращеню U
 - Docker и Docker Compose
 
 
-\```
+```
 # 1. Клонируйте репозиторий:
 git clone https://github.com/disdreamq/LinkFlowAnalytics.git
 cd LinkFlowAnalytics
@@ -35,7 +35,7 @@ cp .env.example . env
 
 # 3. Запустите проект
 docker compose up -d
-\```
+```
 
 ## После выполнения
 API доступен по адресу http://localhost:8000
@@ -54,19 +54,19 @@ FastAPI автоматически документирует нашу API с п
 /analytics/{short_url} и /analytics/premium/{short_url} - получение аналитики по одной вашей ссылки short_url, требуется авторизация.
 
 # Запуск тестов
-\```
+```
 # Запуск тестов в изолированном окружении
 docker-compose run --rm tests
-\```
+```
 
 # Миграции базы данных
 Все миграции производятся с помощью Alembic для SQLAlchemy.
 
-\```
+```
 # Создание новой миграции
 docker-compose exec api alembic revision --autogenerate -m "Описание изменений"
 
 
 # Применение миграций
 docker-compose exec api alembic upgrade head
-\```
+```
