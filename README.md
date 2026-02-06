@@ -47,14 +47,14 @@ API доступен по адресу http://localhost:8000
 
 
 # Документация API
-FastAPI автоматически документирует нашу API с помощью Swagger UI и ReDoc. 
+FastAPI автоматически документирует нашу API с помощью Swagger UI и ReDoc.
 ## Основные эндпоинты
-/users/ (post method) - создание пользователя, не требует авторизации.
-/token/ (post method) - авторизация и получение JWT-токена, не требует авторизации.
-/links/ (post method) - создание короткой ссылки, требует авторизации.
-/{short_url} (get method) - переход по сокращенный ссылке, не требует авторизации. 
-/analytics/summary/ и /analytics/premium/summary - получение аналитики по всем вашим ссылкам, требуется авторизация.
-/analytics/{short_url} и /analytics/premium/{short_url} - получение аналитики по одной вашей ссылки short_url, требуется авторизация.
+/users/ (post method) - создание пользователя, не требует авторизации.  
+/token/ (post method) - авторизация и получение JWT-токена, не требует авторизации.  
+/links/ (post method) - создание короткой ссылки, требует авторизации.  
+/{short_url} (get method) - переход по сокращенный ссылке, не требует авторизации.  
+/analytics/summary/ и /analytics/premium/summary - получение аналитики по всем вашим ссылкам, требуется авторизация.  
+/analytics/{short_url} и /analytics/premium/{short_url} - получение аналитики по одной вашей ссылки short_url, требуется авторизация.  
 
 # Запуск тестов
 ```bash
