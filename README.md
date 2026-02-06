@@ -53,8 +53,8 @@ FastAPI автоматически документирует нашу API с п
 /token/ (post method) - авторизация и получение JWT-токена, не требует авторизации.  
 /links/ (post method) - создание короткой ссылки, требует авторизации.  
 /{short_url} (get method) - переход по сокращенный ссылке, не требует авторизации.  
-/analytics/summary/ и /analytics/premium/summary - получение аналитики по всем вашим ссылкам, требуется авторизация.  
-/analytics/{short_url} и /analytics/premium/{short_url} - получение аналитики по одной вашей ссылки short_url, требуется авторизация.  
+/analytics/summary/ и /analytics/premium/summary (get method) - получение аналитики по всем вашим ссылкам, требуется авторизация.  
+/analytics/{short_url} и /analytics/premium/{short_url} (get method) - получение аналитики по одной вашей ссылки short_url, требуется авторизация.  
 
 # Запуск тестов
 ```bash
