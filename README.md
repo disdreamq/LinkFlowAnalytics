@@ -35,6 +35,9 @@ cp .env.example . env
 
 # 3. Запустите проект
 docker compose up -d
+
+# 4. После завершения сессии удалите все созданные контейнеры сеть
+docker compose down
 ```
 
 ## После выполнения
@@ -56,7 +59,7 @@ FastAPI автоматически документирует нашу API с п
 # Запуск тестов
 ```bash
 # Запуск тестов в изолированном окружении
-docker-compose run --rm tests
+docker compose up tests
 ```
 
 # Миграции базы данных
@@ -64,9 +67,9 @@ docker-compose run --rm tests
 
 ```bash
 # Создание новой миграции
-docker-compose exec api alembic revision --autogenerate -m "Описание изменений"
+docker compose exec api alembic revision --autogenerate -m "Описание изменений"
 
 
 # Применение миграций
-docker-compose exec api alembic upgrade head
+docker compose exec api alembic upgrade head
 ```
