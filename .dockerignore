@@ -19,10 +19,9 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-tests/
 test.db
 .pgadmin_data
-.posthres_data
+.postgres_data
 .pytest_cache
 .redis_data
 .git
