@@ -38,9 +38,9 @@ docker compose up -d
 ```
 
 ## После выполнения
-API доступен по адресу http://localhost:8000
-Авто-документация Swagger: http://localhost:8000/docs
-Авто-документация ReDoc: http://localhost:8000/redoc
+API доступен по адресу http://localhost:8000  
+Авто-документация Swagger: http://localhost:8000/docs  
+Авто-документация ReDoc: http://localhost:8000/redoc  
 
 
 # Документация API
