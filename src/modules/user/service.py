@@ -93,5 +93,5 @@ class UserService:
     async def _verify_id(self, current_user_id: int, user_id: int):
         if current_user_id != 1 and current_user_id != user_id:
             raise PremissonDenaiedException(
-                f"Can not verify {current_user_id=} with {user_id=}"
+                f"Can not match provided {user_id} with current user"
             )
