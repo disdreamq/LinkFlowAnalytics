@@ -46,7 +46,7 @@ cd LinkFlowAnalytics
 
 # 2. setup .env file:
 cp .env.example . env
-# Отредактируйте .env файл, задав свои данные
+# edit .env file with ur data
 
 
 # 3. run the project
