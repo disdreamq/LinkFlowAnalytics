@@ -71,9 +71,9 @@ POST /users/ - create a user, does not require authentication.
 POST /token/ - authenticate and obtain a JWT token, does not require authentication.  
 POST /links/ - create a short link, requires authentication.  
 GET /{short_url} - redirect via the short link, does not require authentication.  
-GET /analytics/summary/ - get analytics for all your links as a basic user, requires authentication. 
+GET /analytics/summary/ - get analytics for all your links as a basic user, requires authentication.  
 GET /analytics/premium/summary - get analytics for all your links as a premium user, requires authentication.  
-GET /analytics/{short_url} - get analytics for one of your link {short_url} as a basic user, requires authentication.
+GET /analytics/{short_url} - get analytics for one of your link {short_url} as a basic user, requires authentication.  
 GET /analytics/premium/{short_url} - get analytics for one of your link {short_url} as a premium user, requires authentication.  
 
 **All endpoints that require authentication expect a valid JWT token in the Authorization: Bearer <token> header.**
