@@ -75,6 +75,10 @@ GET /analytics/summary/ - get analytics for all your links as a basic user, requ
 GET /analytics/premium/summary - get analytics for all your links as a premium user, requires authentication.  
 GET /analytics/{short_url} - get analytics for one of your link {short_url} as a basic user, requires authentication.  
 GET /analytics/premium/{short_url} - get analytics for one of your link {short_url} as a premium user, requires authentication.  
+PUT /users/{user_id} - update user with id {user_id}, requires authentication.  
+PATCH /users/{user_id} - partially update user with id {user_id}, requires authentication.  
+DELETE /users/{user_id} - delete user with id {user_id}, requires authentication.  
+DELETE /links/{short_url} - delete link {short_url}, requires authentication.  
 
 **All endpoints that require authentication expect a valid JWT token in the Authorization: Bearer <token> header.**
 
