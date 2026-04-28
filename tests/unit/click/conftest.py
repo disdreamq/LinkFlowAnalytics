@@ -19,6 +19,9 @@ def fake_cache():
 
     cache.add_to_arr = AsyncMock()
     cache.get = AsyncMock()
+    cache.get_arr = AsyncMock()
+    cache.delete = AsyncMock()
+    cache.set_ = AsyncMock()
 
     return cache
 
@@ -28,7 +31,6 @@ def mock_click_service():
     service = MagicMock()
 
     service.create = AsyncMock()
-    service.increment_click_counters = AsyncMock()
     return service
 
 
@@ -36,8 +38,6 @@ def mock_click_service():
 def mock_link_service():
     service = MagicMock()
 
-    service.create_clicks = AsyncMock()
-    service.get_click = AsyncMock()
     service.increment_click_counters = AsyncMock()
     return service
 
@@ -57,24 +57,10 @@ def sample_click_data():
     return {
         "id": 1,
         "link_id": 1,
-        "user_agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
+        "user_agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",  # noqa: E501
         "user_ip": None,
         "created_at": datetime.datetime.now(),
     }
-
-
-@pytest.fixture
-def sample_alot_of_clicks():
-    return [
-        {
-            "id": i,
-            "link_id": 1,
-            "user_agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
-            "user_ip": None,
-            "created_at": datetime.datetime.now(),
-        }
-        for i in range(1, 11)
-    ]
 
 
 @pytest.fixture
@@ -87,7 +73,7 @@ def sample_click_create(sample_click_data):
     )
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 async def cleanup_cache_between_tests(cache):
     await cache.clear_all()
     yield
