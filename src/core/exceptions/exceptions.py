@@ -73,7 +73,7 @@ class DataBaseException(BaseAppException):
         )
 
 
-class PremissonDenaiedException(BaseAppException):
+class PermissionDeniedException(BaseAppException):
     def __init__(self, message: str, detail: str | None = None):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,
