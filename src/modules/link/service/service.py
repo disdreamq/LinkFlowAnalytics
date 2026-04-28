@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 from fastapi import Depends
 
 from src.core.abstract_repositories.key_value_repository import IKeyValueRepository
-from src.core.exceptions.exceptions import PremissonDenaiedException
+from src.core.exceptions.exceptions import PermissionDeniedException
 from src.db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
 from src.modules.link.repositories.abstract_repositories import IORMLinkRepository
 from src.modules.link.schemas import (
@@ -126,6 +126,6 @@ class LinkService:
     async def _verify_id(self, current_user_id: int, link_url: str):
         link = await self.repo.get_by_url(link_url)
         if current_user_id != 1 and current_user_id != link.user_id:
-            raise PremissonDenaiedException(
+            raise PermissionDeniedException(
                 f"Can not verify {current_user_id=} with link id {link.user_id}"
             )
