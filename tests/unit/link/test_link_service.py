@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.core.exceptions.exceptions import PremissonDenaiedException
+from src.core.exceptions.exceptions import PermissionDeniedException
 from src.modules.click.schemas import SClickResponse
 from src.modules.link.schemas import SLinkResponse, SLinkWithClicks
 
@@ -59,7 +59,7 @@ class TestLinkServiceGetByUrl:
         sample_link_data,
     ):
         """Test for get_by_url that fails due to _verify_id returns False"""
-        with pytest.raises(PremissonDenaiedException):
+        with pytest.raises(PermissionDeniedException):
             await link_service.get_by_url(52, sample_link_data["url"])
 
 
@@ -81,14 +81,14 @@ class TestLinkServiceGetWithClicks:
                     id=1,
                     link_id=1,
                     user_ip=None,
-                    user_agent="Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
+                    user_agent="Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",  # noqa: E501
                     created_at=datetime.datetime.now(),
                 ),
                 SClickResponse(
                     id=2,
                     link_id=1,
                     user_ip=None,
-                    user_agent="Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
+                    user_agent="Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",  # noqa: E501
                     created_at=datetime.datetime.now(),
                 ),
             ],
