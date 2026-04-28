@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi.params import Depends
 
-from src.core.exceptions.exceptions import PremissonDenaiedException
+from src.core.exceptions.exceptions import PermissionDeniedException
 from src.enums.enums import UserTarifPlan
 from src.modules.analytics.premium_user.service import PremiumUserAnalyticService
 from src.modules.auth.dependencies import require_auth
@@ -17,7 +17,7 @@ async def require_premimum_tarifplan(
     current_user: Annotated[SUserInDB, Depends(require_auth)],
 ):
     if current_user.tarifplan != UserTarifPlan.Premium:
-        raise PremissonDenaiedException(
+        raise PermissionDeniedException(
             f"User with user id {current_user.id} doest not match required tarif plan"
         )
 
