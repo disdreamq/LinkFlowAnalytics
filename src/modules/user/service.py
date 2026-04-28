@@ -3,7 +3,7 @@ from typing import Literal
 
 from src.core.exceptions.exceptions import (
     AlreadyExistsException,
-    PremissonDenaiedException,
+    PermissionDeniedException,
 )
 from src.core.security import get_password_hash
 from src.db.deco_for_SQLAlchemy_servicies import handle_service_exceptions
@@ -35,7 +35,7 @@ class UserService:
     async def create(self, user_to_create: SUserCreate) -> SUserResponse:
         if await self.repo.exists_by_email(user_to_create.email):
             logger.error(
-                f"Unique email error while adding user with email {user_to_create.email}"
+                f"Unique email error while adding user with email {user_to_create.email}"  # noqa: E501
             )
             raise AlreadyExistsException(user_to_create.email) from None
         user_to_create.password = get_password_hash(user_to_create.password)
@@ -92,6 +92,6 @@ class UserService:
     @handle_service_exceptions
     async def _verify_id(self, current_user_id: int, user_id: int):
         if current_user_id != 1 and current_user_id != user_id:
-            raise PremissonDenaiedException(
+            raise PermissionDeniedException(
                 f"Can not match provided {user_id} with current user"
             )
