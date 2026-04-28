@@ -95,8 +95,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
-    command: >
-      sh -c "pytest tests/ -v --cov=src"
+    command: pytest tests/ -v --cov=src
     networks:
       - app_network
 
