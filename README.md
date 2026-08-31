@@ -40,7 +40,7 @@ Built with modern Python practices – fully typed, tested, and containerized.
 
 ```bash
 # 1. clone this repository:
-git clone https://github.com/disdreamq/LinkFlowAnalytics.git
+git clone https://github.com/meteoradev/LinkFlowAnalytics
 cd LinkFlowAnalytics
 
 
